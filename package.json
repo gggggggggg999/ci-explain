@@ -1,0 +1,63 @@
+{
+  "name": "ci-explain",
+  "version": "0.1.0",
+  "description": "Explain why your CI failed in seconds: evidence-first, works offline, secrets redacted, AI optional.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Myrza Dokturbekov",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gggggggggg999/ci-explain.git"
+  },
+  "homepage": "https://github.com/gggggggggg999/ci-explain#readme",
+  "bugs": {
+    "url": "https://github.com/gggggggggg999/ci-explain/issues"
+  },
+  "keywords": [
+    "ci",
+    "github-actions",
+    "cli",
+    "devtools",
+    "debugging",
+    "log-analysis"
+  ],
+  "bin": {
+    "ci-explain": "dist/cli/main.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "docs"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node scripts/postbuild.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "eval": "tsx scripts/eval.ts",
+    "docs:gen": "tsx scripts/gen-rules-doc.ts",
+    "docs:check": "tsx scripts/gen-rules-doc.ts --check"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "eslint": "10.12.0",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2",
+    "vitest": "5.0.4"
+  }
+}
