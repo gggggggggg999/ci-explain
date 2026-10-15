@@ -57,3 +57,63 @@ export interface Evidence {
   line: number;
   text: string;
 }
+
+export type Ecosystem = 'node' | 'python' | 'docker' | 'infra' | 'generic';
+export type Category =
+  | 'dependency'
+  | 'test'
+  | 'build'
+  | 'lint'
+  | 'type-check'
+  | 'config'
+  | 'permission'
+  | 'network'
+  | 'resource'
+  | 'unknown';
+export type RuleKind = 'rootCause' | 'symptom';
+
+export interface RuleContext {
+  /** Lines to search: the failed step if known, otherwise the whole log. */
+  lines: LogLine[];
+  step: Step | null;
+  format: LogFormat;
+}
+
+export interface RuleMatch {
+  evidence: Evidence[];
+  captures: Record<string, string>;
+  /** How many similar problems were folded into this match (cascade collapse). */
+  occurrences?: number;
+  /** Overrides the rule's default confidence (for example when the message is less specific). */
+  confidence?: Confidence;
+}
+
+export interface Rule {
+  id: string;
+  title: string;
+  ecosystem: Ecosystem;
+  category: Category;
+  kind: RuleKind;
+  /** Higher wins when confidence ties. */
+  priority: number;
+  confidence: Confidence;
+  /** Date the message format was checked against real tool output or documentation; null if not verified. */
+  verifiedOn: string | null;
+  sourceNote: string;
+  match(ctx: RuleContext): RuleMatch | null;
+  explain(m: RuleMatch): string;
+  suggest(m: RuleMatch): string[];
+}
+
+export interface Finding {
+  ruleId: string;
+  title: string;
+  category: Category;
+  kind: RuleKind;
+  confidence: Confidence;
+  explanation: string;
+  suggestions: string[];
+  step: string | null;
+  evidence: Evidence[];
+  occurrences: number;
+}
