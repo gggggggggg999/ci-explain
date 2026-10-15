@@ -74,3 +74,23 @@ describe('renderMarkdown', () => {
     expect(md).toMatch(/not executed/);
   });
 });
+
+describe('renderMarkdown with AI section', () => {
+  it('labels AI text, keeps suggestions in a fenced "not executed" block', () => {
+    const base = reportFor('Error: ENOSPC: no space left on device, write\n');
+    const md = renderMarkdown({
+      ...base,
+      llm: {
+        used: true,
+        provider: 'llm.example.test',
+        summary: 'Disk is full (L1) @everyone',
+        suggestions: ['rm -rf /tmp/cache'],
+        notice: 'AI-generated, may be wrong.',
+      },
+    });
+    expect(md).toContain('AI-generated, may be wrong');
+    expect(md).toContain('suggestion, not executed');
+    expect(md).not.toContain('@everyone');
+    expect(md).toMatch(/```\n- rm -rf \/tmp\/cache\n```/);
+  });
+});

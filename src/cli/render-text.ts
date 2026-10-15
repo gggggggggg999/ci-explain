@@ -51,7 +51,13 @@ export function renderText(report: Report, options: { color: boolean }): string 
 
   if (report.llm.used) {
     out.push(s.bold('AI explanation') + s.dim(' (AI-generated, may be wrong; untrusted text)'));
+    if (report.llm.provider) out.push(s.dim(`   provider: ${report.llm.provider}`));
     if (report.llm.summary) out.push(`   ${report.llm.summary.split('\n').join('\n   ')}`);
+    if (report.llm.likelyCause) out.push(`   Likely cause: ${report.llm.likelyCause}`);
+    if (report.llm.suggestions && report.llm.suggestions.length > 0) {
+      out.push('   Suggestions (AI-generated; suggestion, not executed):');
+      for (const sug of report.llm.suggestions) out.push(`     - ${sug}`);
+    }
     out.push('');
   } else if (report.llm.unavailableReason) {
     out.push(s.dim(`AI layer unavailable: ${report.llm.unavailableReason}`));

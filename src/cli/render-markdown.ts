@@ -12,7 +12,7 @@ export function escapeMarkdown(text: string): string {
   return text
     .replace(/[\\`*_{}[\]<>|~]/g, (c) => `\\${c}`)
     .replace(/^(\s*)([#>+-])/gm, '$1\\$2')
-    .replace(/@/g, `@${ZWSP}`)
+    .replace(/@(?!\u200b)/g, `@${ZWSP}`)
     .replace(/#(?=\d)/g, `#${ZWSP}`)
     .replace(/\b(https?|ftp):\/\//gi, (_m, scheme: string) => `${scheme}:${ZWSP}//`)
     .replace(/\bwww\./gi, `www${ZWSP}.`)
@@ -75,6 +75,12 @@ export function renderMarkdown(report: Report, options: { maxBytes?: number } = 
     out.push('> AI-generated, may be wrong. Treat as untrusted text.');
     out.push('');
     if (report.llm.summary) out.push(escapeMarkdown(report.llm.summary), '');
+    if (report.llm.likelyCause)
+      out.push(`Likely cause: ${escapeMarkdown(report.llm.likelyCause)}`, '');
+    if (report.llm.suggestions && report.llm.suggestions.length > 0) {
+      out.push('Suggestions (AI-generated; suggestion, not executed):', '');
+      out.push(fence(report.llm.suggestions.map((s) => `- ${s}`).join('\n')), '');
+    }
   } else if (report.llm.unavailableReason) {
     out.push(`> AI layer unavailable: ${escapeMarkdown(report.llm.unavailableReason)}`, '');
   }

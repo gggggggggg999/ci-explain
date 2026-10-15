@@ -46,3 +46,23 @@ above is a defensible focus. No blocker.
   actually run in CI.
 - `node:util parseArgs` exists in local Node 22 (typeof = function); stability
   status to be checked in docs.
+
+## D-004. Argument parser
+`node:util parseArgs` is used (no dependency). Node docs history: "v20.0.0: The API is no longer
+experimental." (https://nodejs.org/docs/latest-v22.x/api/util.html, checked 2026-10-15; the fetched page did
+not show a stability line, so only the history entry is relied on). `engines` is >= 22.12.0.
+
+## D-005. Build
+Plain `tsc` (ESM only, `NodeNext`). tsup 9 requires Node >= 22.18 but CI also runs 22.12.0; a bundler adds
+nothing for a CLI with one runtime dependency. TypeScript is pinned to 6.0.3 because typescript-eslint 8.71.2
+declares support for `typescript <6.1.0` (TypeScript 7 is the latest release).
+
+## D-006. AI provider
+One adapter: OpenAI-compatible chat completions (`POST {base}/chat/completions`, `Authorization: Bearer`,
+`messages`, `choices[0].message.content`). The official OpenAI API reference pages could not be fetched on
+2026-10-15 (HTTP 403/404), so the request shape rests on the widely used chat-completions contract and
+secondary sources confirming that `max_tokens` is deprecated in favor of `max_completion_tokens`
+(compatible servers may only know `max_tokens`, hence `--llm-max-tokens-param`).
+Not verified with a real provider: documentation says "should work, untested".
+No default base URL and no default model: the user must choose where the redacted excerpt goes.
+Redirects are never followed, so the API key can only reach the configured host.

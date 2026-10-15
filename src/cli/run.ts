@@ -4,6 +4,16 @@ import { renderExcerpt } from '../core/excerpt.js';
 import { buildReport } from '../core/report.js';
 import { DEFAULT_MAX_BYTES, InputError, readInput } from '../io/read-input.js';
 import { OutputFileError, writeFileSafely } from '../io/write-output.js';
+import { explainWithLlm } from '../llm/explain.js';
+import { createOpenAiCompatibleProvider } from '../llm/openai-compatible.js';
+import {
+  buildPrompt,
+  DEFAULT_MAX_INPUT_BYTES,
+  DEFAULT_MAX_OUTPUT_TOKENS,
+  formatPromptForDisplay,
+} from '../llm/prompt.js';
+import { LlmError } from '../llm/provider.js';
+import type { LlmSection } from '../core/schema.js';
 import { readVersion } from '../version.js';
 import { HELP_TEXT, parseCliArgs, UsageError } from './args.js';
 import { renderJson } from './render-json.js';
@@ -15,9 +25,18 @@ export interface CliIo {
   stdout: { write(s: string): unknown; isTTY?: boolean };
   stderr: { write(s: string): unknown };
   env: Record<string, string | undefined>;
+  /** Injectable for tests; defaults to the global fetch. */
+  fetch?: typeof fetch;
 }
 
-export const EXIT = { OK: 0, UNEXPECTED: 1, USAGE: 2, INPUT: 3 } as const;
+export const EXIT = {
+  OK: 0,
+  UNEXPECTED: 1,
+  USAGE: 2,
+  INPUT: 3,
+  EXTERNAL: 4,
+  LLM_REQUIRED: 5,
+} as const;
 
 export async function run(argv: string[], io: CliIo): Promise<number> {
   try {
@@ -62,9 +81,64 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
       firstLineNumber: input.firstLineNumber,
     });
     const version = readVersion();
+
+    if (opts.showPrompt) {
+      // Shows exactly what --llm would send. Nothing is sent, no key or URL is needed.
+      const prompt = buildPrompt(result, {
+        maxInputBytes: opts.llmMaxInputBytes ?? DEFAULT_MAX_INPUT_BYTES,
+      });
+      io.stdout.write(formatPromptForDisplay(prompt));
+      io.stderr.write('Nothing was sent. This is the exact text --llm would send.\n');
+      return EXIT.OK;
+    }
+
+    let llm: LlmSection = { used: false };
+    if (opts.llm) {
+      const apiKey = io.env.CI_EXPLAIN_LLM_API_KEY;
+      const baseUrl = opts.llmBaseUrl ?? io.env.CI_EXPLAIN_LLM_BASE_URL;
+      const model = opts.llmModel ?? io.env.CI_EXPLAIN_LLM_MODEL;
+      if (!apiKey) {
+        throw new UsageError(
+          '--llm needs the API key in the CI_EXPLAIN_LLM_API_KEY environment variable (never pass it as an argument).',
+        );
+      }
+      if (!baseUrl)
+        throw new UsageError('--llm needs --llm-base-url (or CI_EXPLAIN_LLM_BASE_URL).');
+      if (!model) throw new UsageError('--llm needs --llm-model (or CI_EXPLAIN_LLM_MODEL).');
+      let provider;
+      try {
+        provider = createOpenAiCompatibleProvider({
+          baseUrl,
+          apiKey,
+          model,
+          timeoutMs: (opts.llmTimeoutSeconds ?? 30) * 1000,
+          ...(opts.llmTokenParam ? { tokenParam: opts.llmTokenParam } : {}),
+          ...(io.fetch ? { fetchImpl: io.fetch } : {}),
+        });
+      } catch (err) {
+        if (err instanceof LlmError) throw new UsageError(err.message);
+        throw err;
+      }
+      const prompt = buildPrompt(result, {
+        maxInputBytes: opts.llmMaxInputBytes ?? DEFAULT_MAX_INPUT_BYTES,
+      });
+      io.stderr.write(
+        `AI layer (--llm): sending a redacted excerpt (${prompt.excerptBytes} bytes, ${prompt.includedLines} lines) to ${provider.name}. ` +
+          'Use --show-prompt to preview exactly what is sent.\n',
+      );
+      llm = await explainWithLlm(provider, prompt, {
+        model,
+        maxOutputTokens: opts.llmMaxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
+      });
+      if (!llm.used) {
+        io.stderr.write(`AI layer unavailable: ${llm.unavailableReason ?? 'unknown reason'}.\n`);
+      }
+    }
+
     const report = buildReport(result, {
       toolVersion: version,
       sourceKind: source === '-' ? 'stdin' : 'file',
+      llm,
     });
 
     if (opts.exportExcerpt) {
@@ -86,6 +160,7 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
     if (opts.format === 'json') io.stdout.write(renderJson(report));
     else if (opts.format === 'markdown') io.stdout.write(renderMarkdown(report));
     else io.stdout.write(renderText(report, { color }));
+    if (opts.llmRequired && !llm.used) return EXIT.LLM_REQUIRED;
     return EXIT.OK;
   } catch (err) {
     if (err instanceof UsageError) {

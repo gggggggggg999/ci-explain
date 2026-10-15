@@ -13,6 +13,15 @@ export interface CliOptions {
   redactPii: boolean;
   exportExcerpt: string | null;
   force: boolean;
+  llm: boolean;
+  showPrompt: boolean;
+  llmBaseUrl: string | null;
+  llmModel: string | null;
+  llmRequired: boolean;
+  llmMaxInputBytes: number | null;
+  llmMaxOutputTokens: number | null;
+  llmTimeoutSeconds: number | null;
+  llmTokenParam: 'max_completion_tokens' | 'max_tokens' | null;
   positionals: string[];
 }
 
@@ -45,6 +54,15 @@ export function parseCliArgs(argv: string[]): CliOptions {
         'redact-pii': { type: 'boolean' },
         'export-excerpt': { type: 'string' },
         force: { type: 'boolean' },
+        llm: { type: 'boolean' },
+        'show-prompt': { type: 'boolean' },
+        'llm-base-url': { type: 'string' },
+        'llm-model': { type: 'string' },
+        'llm-required': { type: 'boolean' },
+        'llm-max-input-bytes': { type: 'string' },
+        'llm-max-output-tokens': { type: 'string' },
+        'llm-timeout': { type: 'string' },
+        'llm-max-tokens-param': { type: 'string' },
       },
     });
   } catch (err) {
@@ -58,6 +76,20 @@ export function parseCliArgs(argv: string[]): CliOptions {
   if (v['no-redact'] && format !== 'text') {
     throw new UsageError('--no-redact is only allowed with --format text');
   }
+  const tokenParam = v['llm-max-tokens-param'] ?? null;
+  if (
+    tokenParam !== null &&
+    tokenParam !== 'max_completion_tokens' &&
+    tokenParam !== 'max_tokens'
+  ) {
+    throw new UsageError('--llm-max-tokens-param must be max_completion_tokens or max_tokens');
+  }
+  if ((v.llm || v['show-prompt']) && v['no-redact']) {
+    throw new UsageError('--no-redact cannot be combined with --llm or --show-prompt');
+  }
+  if (v['llm-required'] && !v.llm) {
+    throw new UsageError('--llm-required needs --llm');
+  }
   return {
     help: v.help ?? false,
     version: v.version ?? false,
@@ -69,6 +101,19 @@ export function parseCliArgs(argv: string[]): CliOptions {
     redactPii: v['redact-pii'] ?? false,
     exportExcerpt: v['export-excerpt'] ?? null,
     force: v.force ?? false,
+    llm: v.llm ?? false,
+    showPrompt: v['show-prompt'] ?? false,
+    llmBaseUrl: v['llm-base-url'] ?? null,
+    llmModel: v['llm-model'] ?? null,
+    llmRequired: v['llm-required'] ?? false,
+    llmMaxInputBytes: v['llm-max-input-bytes']
+      ? positiveInt('--llm-max-input-bytes', v['llm-max-input-bytes'])
+      : null,
+    llmMaxOutputTokens: v['llm-max-output-tokens']
+      ? positiveInt('--llm-max-output-tokens', v['llm-max-output-tokens'])
+      : null,
+    llmTimeoutSeconds: v['llm-timeout'] ? positiveInt('--llm-timeout', v['llm-timeout']) : null,
+    llmTokenParam: tokenParam,
     positionals: parsed.positionals,
   };
 }
@@ -90,6 +135,20 @@ Options:
   --export-excerpt <file>        Write a redacted excerpt for bug reports (never overwrites
                                  without --force; nothing is sent anywhere)
   --force                        Allow --export-excerpt to overwrite an existing file
+  --show-prompt                  Print exactly what the AI layer would send (after redaction)
+                                 and exit. Sends nothing.
+  --llm                          Add an AI explanation (OFF by default). Needs the API key in
+                                 CI_EXPLAIN_LLM_API_KEY, plus --llm-base-url and --llm-model
+                                 (or CI_EXPLAIN_LLM_BASE_URL / CI_EXPLAIN_LLM_MODEL).
+  --llm-base-url <url>           OpenAI-compatible base URL (https, or http for localhost).
+                                 You choose where the redacted excerpt is sent.
+  --llm-model <name>             Model name (no default)
+  --llm-required                 Exit with code 5 if the AI layer is unavailable
+  --llm-max-input-bytes <n>      Maximum log excerpt sent to the model (default: 24000)
+  --llm-max-output-tokens <n>    Maximum output tokens (default: 800)
+  --llm-timeout <seconds>        Request timeout (default: 30)
+  --llm-max-tokens-param <name>  max_completion_tokens (default) or max_tokens, for servers that
+                                 only know the older name
   -h, --help                     Show this help
   -v, --version                  Show the version
 
@@ -101,4 +160,5 @@ Exit codes:
   1  unexpected error
   2  invalid arguments
   3  input unreadable, empty, or unsupported
+  5  --llm-required was set and the AI layer was unavailable
 `;

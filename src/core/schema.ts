@@ -24,6 +24,9 @@ export const LlmSectionSchema = z.object({
   provider: z.string().optional(),
   model: z.string().optional(),
   summary: z.string().optional(),
+  likelyCause: z.string().optional(),
+  /** Model-suggested actions. Text only: never executed. */
+  suggestions: z.array(z.string()).optional(),
   /** Always present when `used` is true: the text is untrusted model output. */
   notice: z.string().optional(),
   /** Why the AI layer produced nothing (never contains keys or prompts). */

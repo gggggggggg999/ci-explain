@@ -80,3 +80,17 @@
 - CLI verified from a packed tarball installed into a clean temp dir (help, version, analysis, stdin, exit codes).
 - Entry point split: `src/cli/main.ts` (bin) and `src/cli/run.ts` (testable), because a symlinked bin
   breaks "am I the entry module" checks.
+
+## Stage 6 — optional AI layer (2026-10-15)
+- Off by default; `--llm` needs `CI_EXPLAIN_LLM_API_KEY` (env only), `--llm-base-url` and `--llm-model`
+  (or the matching env vars). Missing pieces fail with exit 2, never silently.
+- `--show-prompt` prints the exact redacted messages and sends nothing (tested with a stubbed global fetch).
+- Prompt: system instructions are separate from the untrusted log; the log sits between fixed markers
+  (forged markers are neutralized); only redacted error windows + rule ids/titles/line numbers are included;
+  a second redaction pass runs over the final text; input/output budgets are configurable.
+- Model output must be JSON validated by Zod; anything else is discarded. Text is stripped of HTML, images,
+  links, control chars, mentions and issue refs; suggestions are shown as "suggestion, not executed".
+- Reliability: timeout (no retry), retry only 429/5xx/network (2 retries, backoff), 401/403 no retry;
+  errors carry fixed messages (no key, headers, prompt or body); failures degrade to layer-1 output
+  (`--llm-required` makes it exit 5).
+- ALL AI tests use mocks. No real provider call was made; no compatibility is claimed.
