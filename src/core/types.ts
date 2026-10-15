@@ -13,6 +13,8 @@ export interface LogLine {
 export interface NormalizeOptions {
   /** Longer lines are truncated (before any regex runs). Default 2000. */
   maxLineLength?: number;
+  /** Original number of the first input line (when the head of a big log was skipped). Default 1. */
+  firstLineNumber?: number;
 }
 
 export interface NormalizedLog {

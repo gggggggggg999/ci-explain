@@ -17,6 +17,7 @@ import type {
 export interface AnalyzeOptions {
   maxFindings?: number;
   maxLineLength?: number;
+  firstLineNumber?: number;
   extract?: ExtractOptions;
   /** Redact secrets before anything else runs (default true). Only disable for local terminal use. */
   redact?: boolean;
@@ -125,7 +126,10 @@ function unknownFinding(windows: ErrorWindow[], stepName: string | null): Findin
 /** Analyzes a raw log string. Pure and deterministic: no I/O, no clock, no randomness. */
 export function analyzeLog(input: string, options: AnalyzeOptions = {}): AnalysisResult {
   const rules = options.rules ?? defaultRules;
-  const normalizeOptions = options.maxLineLength ? { maxLineLength: options.maxLineLength } : {};
+  const normalizeOptions = {
+    ...(options.maxLineLength ? { maxLineLength: options.maxLineLength } : {}),
+    ...(options.firstLineNumber ? { firstLineNumber: options.firstLineNumber } : {}),
+  };
   const normalized = normalizeLog(input, normalizeOptions);
   const redacted =
     options.redact === false

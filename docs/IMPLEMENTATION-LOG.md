@@ -34,6 +34,7 @@
 - Tests: 20 passing (normalize, segmentation, extraction, determinism, pathological input timing).
 
 ## Stage 3 — rules and ranking (2026-10-15)
+
 - 18 rules so far (node/npm, TypeScript, ESLint, Prettier, Jest/Vitest, pytest, import errors,
   Node heap OOM, disk full, GitHub token permissions, exit-code symptom). Remaining rules from the
   target catalog are scheduled for Stage 8.
@@ -49,6 +50,7 @@
 - `npm run docs:check`: RULES.md in sync.
 
 ## Stage 4 — secret redaction (2026-10-15)
+
 - `src/core/redact.ts`: GitHub tokens (ghp/gho/ghu/ghs/ghr/github_pat), AWS access key IDs (AKIA/ASIA),
   npm, Slack, Google API, Stripe-style keys, Azure `AccountKey=`/`sig=`, JWT, Authorization/Bearer,
   URL credentials, secret-looking KEY=value / JSON pairs, multi-line private key blocks, optional PII (e-mail, IPv4).
@@ -61,3 +63,20 @@
   excerpts and AI prompts never contain raw values. Only counts (`redactions.count`, `byKind`) are reported.
 - Tests build fake secrets by concatenation; a repository scan test asserts no ready-made secret
   strings (strict kinds) and no `.env` files exist. `npm test`: 423 passed.
+
+## Stage 5 — CLI and output formats (2026-10-15)
+- `ci-explain <file|->` with `--format text|markdown|json`, `--max-findings`, `--max-bytes`,
+  `--no-color`/`NO_COLOR`, `--no-redact` (text only, warns), `--redact-pii`, `--export-excerpt`, `--force`,
+  `--help`, `--version`. Exit codes 0/1/2/3 (4 and 5 arrive with the GitHub and AI stages).
+- `node:util parseArgs` is used: Node docs history says "The API is no longer experimental" since v20.0.0
+  (stability line itself not shown in the fetched page; checked 2026-10-15).
+- Input is read as a stream keeping only the last `--max-bytes` (default 32 MiB); the tail is analyzed,
+  `truncated: true` is set, and line numbers still refer to the original input.
+- JSON output is validated by a Zod schema (`schemaVersion: 1`). Markdown is escaped (formatting, HTML,
+  images, @mentions, #123, autolinks), evidence lives in a fence longer than any backtick run in the
+  content, size is capped at 1,000,000 bytes (GitHub documents 1 MiB per step for job summaries).
+- Excerpts are always redacted (even with `--no-redact`), carry a "review before sharing" header and never
+  overwrite files without `--force`.
+- CLI verified from a packed tarball installed into a clean temp dir (help, version, analysis, stdin, exit codes).
+- Entry point split: `src/cli/main.ts` (bin) and `src/cli/run.ts` (testable), because a symlinked bin
+  breaks "am I the entry module" checks.

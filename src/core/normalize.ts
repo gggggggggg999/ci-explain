@@ -45,6 +45,7 @@ function cleanRawLine(raw: string, index: number, maxLen: number): { text: strin
 export function normalizeLog(input: string, options: NormalizeOptions = {}): NormalizedLog {
   const maxLen = options.maxLineLength ?? DEFAULT_MAX_LINE_LENGTH;
   const warnings: string[] = [];
+  const firstLine = options.firstLineNumber ?? 1;
 
   const rawLines = input.split('\n');
   if (rawLines.length > 0 && rawLines[rawLines.length - 1] === '') rawLines.pop();
@@ -58,7 +59,7 @@ export function normalizeLog(input: string, options: NormalizeOptions = {}): Nor
   rawLines.forEach((raw, i) => {
     const { text, cut } = cleanRawLine(raw, i, maxLen);
     if (cut) truncatedLineCount++;
-    cleaned.push({ n: i + 1, text });
+    cleaned.push({ n: i + firstLine, text });
   });
 
   const nonEmpty = cleaned.filter((l) => l.text.trim() !== '');
@@ -123,7 +124,7 @@ export function normalizeLog(input: string, options: NormalizeOptions = {}): Nor
 
   return {
     lines: result,
-    originalLineCount: rawLines.length,
+    originalLineCount: rawLines.length + firstLine - 1,
     hadTimestamps,
     hadGhPrefix,
     truncatedLineCount,
