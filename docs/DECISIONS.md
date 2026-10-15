@@ -69,3 +69,29 @@ secondary sources confirming that `max_tokens` is deprecated in favor of `max_co
 Not verified with a real provider: documentation says "should work, untested".
 No default base URL and no default model: the user must choose where the redacted excerpt goes.
 Redirects are never followed, so the API key can only reach the configured host.
+
+## D-007. Honesty of evaluation
+Fixtures are written by hand, mostly from real local tool output (npm 10.9.0, pnpm 10, Yarn 1.22, tsc 6.0.3,
+ESLint 10.12.0, Prettier 3.9.10, Vitest 5.0.4, Node 22, pytest 9.1.1, pip, git 2.37) and otherwise from
+documented or remembered message formats (each such rule says so in `sourceNote` and has
+`verifiedOn: null`; see docs/RULES.md). `npm run eval` is a regression check: it passing does NOT measure
+accuracy on real logs. No accuracy percentage is published, and none will be until a set of real, anonymized
+logs collected with the permission of repository owners exists (that is the owner's task).
+Docker, node-gyp and several network/GitHub wordings could not be reproduced locally (docker is not
+installed on the maintainer's machine), so those rules are capped at medium confidence.
+
+## D-008. Performance (measured 2026-10-15)
+Machine: Intel Core i5-6267U @ 2.90 GHz, 4 logical CPUs, 8 GiB RAM, macOS 12.7.6, Node v22.12.0.
+Input: synthetic GitHub Actions-style logs from `scripts/gen-big-log.mjs` (timestamps, ANSI colors,
+one TypeScript error per 5000 lines, final exit-code error), run as
+`node dist/cli/main.js <file> --format json --max-bytes 1073741824`, timed with `/usr/bin/time -l`, one run each:
+
+| Input size | Wall time | Peak RSS |
+| --- | --- | --- |
+| 10 MiB (10,485,902 bytes) | 1.60 s | 146 MB |
+| 100 MiB (104,857,721 bytes) | 12.34 s | 606 MB |
+
+Peak memory is several times the input size because the (bounded) input is held in memory and split into
+line objects. The default `--max-bytes` is 32 MiB (the END of a bigger log is analyzed), which keeps memory
+use in the low hundreds of MB on this machine. These are single-run numbers on one machine, not a benchmark
+suite. A regression test (`tests/unit/performance.test.ts`) uses a ~5 MiB log with a 15 s ceiling.

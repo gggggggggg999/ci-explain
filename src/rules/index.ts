@@ -1,13 +1,29 @@
 import { z } from 'zod';
 import type { Rule } from '../core/types.js';
-import { exitCodeSymptom, tokenPermissions } from './generic/index.js';
-import { diskFull, nodeHeapOom } from './infra/index.js';
+import {
+  exitCodeSymptom,
+  gitCheckout,
+  gitPermissionDenied,
+  missingEnv,
+  tokenPermissions,
+} from './generic/index.js';
+import { dockerBuildFailed, dockerCopyNotFound, dockerRateLimit } from './docker/index.js';
+import {
+  diskFull,
+  githubRateLimit,
+  jobCancelled,
+  jobTimeout,
+  networkErrors,
+  nodeHeapOom,
+  oomExit137,
+} from './infra/index.js';
 import { eslintProblems, prettierCheck } from './node/lint.js';
 import { moduleNotFound } from './node/module-not-found.js';
+import { enginesMismatch, nodeGyp, pnpmLockfile, yarnLockfile } from './node/package-managers.js';
 import { npmAuth, npmCiLockMismatch, npmE404, npmEacces, npmEresolve } from './node/npm.js';
 import { testFailures, testSnapshot, testTimeout } from './node/tests.js';
 import { typescriptErrors } from './node/typescript.js';
-import { pythonImportError, pytestFailures } from './python/index.js';
+import { pipDependency, pythonImportError, pytestFailures } from './python/index.js';
 
 const RuleMetaSchema = z.object({
   id: z.string().regex(/^[a-z0-9]+(?:[.-][a-z0-9]+)+$/, 'id must be lower-case dotted'),
@@ -52,6 +68,22 @@ const ALL_RULES: Rule[] = [
   pytestFailures,
   nodeHeapOom,
   diskFull,
+  pnpmLockfile,
+  yarnLockfile,
+  enginesMismatch,
+  nodeGyp,
+  pipDependency,
+  dockerBuildFailed,
+  dockerRateLimit,
+  dockerCopyNotFound,
+  oomExit137,
+  jobTimeout,
+  jobCancelled,
+  networkErrors,
+  githubRateLimit,
+  gitPermissionDenied,
+  gitCheckout,
+  missingEnv,
   tokenPermissions,
   exitCodeSymptom,
 ];

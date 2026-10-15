@@ -1,0 +1,40 @@
+name: New rule request
+description: Ask for a failure that ci-explain should recognize
+labels: [new-rule]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The best requests come with a **real, anonymized excerpt**. Create it with
+        `ci-explain <log> --export-excerpt excerpt.txt`, then **read the file yourself and remove anything
+        private** before pasting it. Redaction is pattern-based and can miss secrets.
+        Never paste real tokens, private repository names, internal URLs, or personal data.
+  - type: input
+    id: tool
+    attributes:
+      label: Tool and version that printed the error
+      placeholder: e.g. npm 10.9.0, pytest 9.1, docker buildx 0.20
+    validations:
+      required: true
+  - type: textarea
+    id: excerpt
+    attributes:
+      label: Anonymized log excerpt
+      description: The lines that show the failure, with a few lines of context.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: cause
+    attributes:
+      label: What is the actual cause and the usual fix?
+      description: Link to the tool's documentation if there is any.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I reviewed the excerpt by hand and removed secrets and private data.
+          required: true

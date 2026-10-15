@@ -106,3 +106,64 @@ export const pytestFailures: Rule = {
     return ['Run the failing test locally and read the assertion output shown above the summary.'];
   },
 };
+
+const PIP_NOT_FOUND = /^ERROR: Could not find a version that satisfies the requirement (\S{1,200})/;
+const PIP_NO_DIST = /^ERROR: No matching distribution found for (\S{1,200})/;
+
+export const pipDependency: Rule = {
+  id: 'python.pip.dependency',
+  title: 'pip cannot resolve or find a dependency',
+  ecosystem: 'python',
+  category: 'dependency',
+  kind: 'rootCause',
+  priority: 75,
+  confidence: 'high',
+  verifiedOn: '2026-10-15',
+  sourceNote:
+    'The "Could not find a version" / "No matching distribution" messages were checked against real pip output (Python 3.14). The dependency-conflict wording (ResolutionImpossible / "conflicting dependencies") was not checked against a real run, so it is reported with medium confidence.',
+  match(ctx): RuleMatch | null {
+    const notFound = indexOfLine(ctx, (t) => PIP_NOT_FOUND.test(t));
+    if (notFound >= 0) {
+      const line = ctx.lines[notFound] as LogLine;
+      const evidence = [ev(line)];
+      const dist = ctx.lines
+        .slice(notFound + 1, notFound + 4)
+        .find((l) => PIP_NO_DIST.test(l.text));
+      if (dist) evidence.push(ev(dist));
+      return {
+        evidence,
+        captures: {
+          requirement: cap(PIP_NOT_FOUND.exec(line.text)?.[1] ?? ''),
+          variant: 'not-found',
+        },
+      };
+    }
+    const conflict = indexOfLine(
+      ctx,
+      (t) =>
+        t.startsWith('ERROR: ResolutionImpossible') ||
+        t.includes('because these package versions have conflicting dependencies'),
+    );
+    if (conflict >= 0) {
+      return {
+        evidence: [ev(ctx.lines[conflict] as LogLine)],
+        captures: { variant: 'conflict' },
+        confidence: 'medium',
+      };
+    }
+    return null;
+  },
+  explain(m) {
+    return m.captures.variant === 'conflict'
+      ? 'pip could not find a set of package versions that satisfy all requirements at once (conflicting dependencies).'
+      : `pip found no installable version of ${m.captures.requirement}: the name or version may be wrong, or it may not exist for this Python version and platform.`;
+  },
+  suggest(m) {
+    return m.captures.variant === 'conflict'
+      ? ['Loosen or align the conflicting version pins in the requirements files.']
+      : [
+          'Check the package name and version pin for typos.',
+          'Check that the package supports the Python version used by this job.',
+        ];
+  },
+};

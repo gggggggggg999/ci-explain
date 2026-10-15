@@ -98,6 +98,7 @@
 - ALL AI tests use mocks. No real provider call was made; no compatibility is claimed.
 
 ## Stage 7 — GitHub source and workflow example (2026-10-15)
+
 - `ci-explain github --repo owner/name --run <id>` (token from `GITHUB_TOKEN` only). Official REST endpoints
   checked 2026-10-15: list jobs for a run, download job logs (302 to a link that expires after 1 minute),
   `X-GitHub-Api-Version: 2026-03-10`. Redirects are manual; the token is never sent to another host
@@ -110,3 +111,15 @@
   no PR checkout). NOT run in a real repository: marked "needs manual verification". `yaml` added as a dev dependency
   (ISC, no dependencies) for those tests.
 - All GitHub tests use local mock HTTP servers; no real GitHub request was made by the tool.
+
+## Stage 8 — complete rule catalog, contributor docs, performance (2026-10-15)
+- Catalog now has 34 rules, covering every item of the target list. New ones: pnpm/yarn frozen lockfile,
+  engines, node-gyp, pip, Docker (build failed, rate limit, COPY not found), exit 137, job timeout,
+  job canceled, network codes, GitHub API rate limit, git permission denied, checkout/submodule, missing env.
+- Real local output used for pnpm 10, Yarn 1.22, npm engine-strict, pip, git. Real output revealed wording
+  differences from memory (for example Yarn: "was run with", not "was executed with"). Docker, node-gyp
+  and others could not be reproduced here; they are marked unverified and capped at medium confidence.
+- Added `defineLineRule` helper, docs/WRITING-RULES.md, issue templates (bug, new-rule-request,
+  false-positive), PR template.
+- Performance measured and recorded in DECISIONS (D-008); regression test added.
+- `npm test`: 835 passed. `npm run eval`: 34 rules, 0 missed, 0 false positives (synthetic fixtures).

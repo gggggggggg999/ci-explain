@@ -1,4 +1,14 @@
-import type { Evidence, LogLine, RuleContext } from '../core/types.js';
+import type {
+  Category,
+  Confidence,
+  Ecosystem,
+  Evidence,
+  LogLine,
+  Rule,
+  RuleContext,
+  RuleKind,
+  RuleMatch,
+} from '../core/types.js';
 
 export const MAX_EVIDENCE_TEXT = 300;
 export const MAX_CAPTURE = 120;
@@ -46,4 +56,55 @@ export function dedupeEvidence(items: Evidence[]): Evidence[] {
 
 export function plural(n: number, one: string, many = one + 's'): string {
   return n === 1 ? one : many;
+}
+
+export interface LineRuleSpec {
+  id: string;
+  title: string;
+  ecosystem: Ecosystem;
+  category: Category;
+  kind?: RuleKind;
+  priority: number;
+  confidence: Confidence;
+  verifiedOn: string | null;
+  sourceNote: string;
+  /** Does this line trigger the rule? Use substring checks or simple anchored regexes only. */
+  find: (text: string) => boolean;
+  /** Extracts values from the triggering line (kept short by `cap`). */
+  captures?: (line: LogLine) => Record<string, string>;
+  /** Extra evidence lines: given all lines and the index of the trigger. */
+  related?: (lines: LogLine[], index: number) => LogLine[];
+  confidenceFor?: (line: LogLine) => Confidence | undefined;
+  explain: (m: RuleMatch) => string;
+  suggest: (m: RuleMatch) => string[];
+}
+
+/** Builds a rule that fires on the first line accepted by `find` and attaches related lines as evidence. */
+export function defineLineRule(spec: LineRuleSpec): Rule {
+  return {
+    id: spec.id,
+    title: spec.title,
+    ecosystem: spec.ecosystem,
+    category: spec.category,
+    kind: spec.kind ?? 'rootCause',
+    priority: spec.priority,
+    confidence: spec.confidence,
+    verifiedOn: spec.verifiedOn,
+    sourceNote: spec.sourceNote,
+    match(ctx): RuleMatch | null {
+      const at = indexOfLine(ctx, spec.find);
+      if (at < 0) return null;
+      const line = ctx.lines[at] as LogLine;
+      const evidence = [ev(line), ...(spec.related?.(ctx.lines, at) ?? []).map(ev)];
+      const match: RuleMatch = {
+        evidence: dedupeEvidence(evidence),
+        captures: spec.captures?.(line) ?? {},
+      };
+      const conf = spec.confidenceFor?.(line);
+      if (conf) match.confidence = conf;
+      return match;
+    },
+    explain: spec.explain,
+    suggest: spec.suggest,
+  };
 }

@@ -1,0 +1,35 @@
+name: False positive
+description: ci-explain named a cause that is wrong
+labels: [false-positive]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wrong explanations are the most valuable reports. **Do not paste real secrets or private data.**
+        Use `--export-excerpt` and review the file by hand first.
+  - type: input
+    id: version
+    attributes:
+      label: ci-explain version
+    validations:
+      required: true
+  - type: input
+    id: rule
+    attributes:
+      label: Rule id that fired
+      placeholder: e.g. node.npm.eresolve
+    validations:
+      required: true
+  - type: textarea
+    id: excerpt
+    attributes:
+      label: Anonymized log excerpt
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What was the real cause?
+    validations:
+      required: true

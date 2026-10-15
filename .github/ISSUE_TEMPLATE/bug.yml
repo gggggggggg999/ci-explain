@@ -1,0 +1,42 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not paste real secrets, tokens, private logs, internal URLs, or personal data.**
+        If a log is needed, create an excerpt with `--export-excerpt` and review it by hand first.
+  - type: input
+    id: version
+    attributes:
+      label: ci-explain version
+      description: Output of `ci-explain --version`
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node.js version and OS
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command you ran
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Include the output and exit code, with anything private removed.
+    validations:
+      required: true
