@@ -1,6 +1,7 @@
 import { rules as defaultRules } from '../rules/index.js';
 import { extractWindows, type ExtractOptions } from './extract.js';
 import { normalizeLog } from './normalize.js';
+import { redactLines, type RedactionSummary } from './redact.js';
 import { segmentLog } from './segment.js';
 import type {
   Confidence,
@@ -17,6 +18,10 @@ export interface AnalyzeOptions {
   maxFindings?: number;
   maxLineLength?: number;
   extract?: ExtractOptions;
+  /** Redact secrets before anything else runs (default true). Only disable for local terminal use. */
+  redact?: boolean;
+  /** Also redact e-mail and IPv4 addresses. */
+  redactPii?: boolean;
   /** Set by the caller when the input was cut (for example by --max-bytes). */
   inputTruncated?: boolean;
   /** Injectable for tests. */
@@ -29,6 +34,7 @@ export interface AnalysisResult {
   exitCode: number | null;
   truncated: boolean;
   warnings: string[];
+  redactions: RedactionSummary;
   findings: Finding[];
   /** Total findings before the maxFindings cut. */
   totalFindings: number;
@@ -120,7 +126,12 @@ function unknownFinding(windows: ErrorWindow[], stepName: string | null): Findin
 export function analyzeLog(input: string, options: AnalyzeOptions = {}): AnalysisResult {
   const rules = options.rules ?? defaultRules;
   const normalizeOptions = options.maxLineLength ? { maxLineLength: options.maxLineLength } : {};
-  const log = normalizeLog(input, normalizeOptions);
+  const normalized = normalizeLog(input, normalizeOptions);
+  const redacted =
+    options.redact === false
+      ? { lines: normalized.lines, count: 0, byKind: {} }
+      : redactLines(normalized.lines, { pii: options.redactPii ?? false });
+  const log = { ...normalized, lines: redacted.lines };
   const seg = segmentLog(log);
   const windows = extractWindows(log, seg, options.extract);
 
@@ -158,6 +169,7 @@ export function analyzeLog(input: string, options: AnalyzeOptions = {}): Analysi
     exitCode: seg.exitCode,
     truncated: options.inputTruncated ?? false,
     warnings: log.warnings,
+    redactions: { count: redacted.count, byKind: redacted.byKind },
     findings,
     totalFindings: ranked.length,
     windows,

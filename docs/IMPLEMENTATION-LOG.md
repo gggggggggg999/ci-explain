@@ -47,3 +47,17 @@
 - Every fixture is tested in 6 variants (clean, ANSI, CRLF, timestamps, group, full GitHub-like).
 - `npm test`: 397 passed. `npm run eval`: 18 rules, 0 missed, 0 false positives (synthetic fixtures only).
 - `npm run docs:check`: RULES.md in sync.
+
+## Stage 4 — secret redaction (2026-10-15)
+- `src/core/redact.ts`: GitHub tokens (ghp/gho/ghu/ghs/ghr/github_pat), AWS access key IDs (AKIA/ASIA),
+  npm, Slack, Google API, Stripe-style keys, Azure `AccountKey=`/`sig=`, JWT, Authorization/Bearer,
+  URL credentials, secret-looking KEY=value / JSON pairs, multi-line private key blocks, optional PII (e-mail, IPv4).
+- Checked against GitHub docs (2026-10-15): token prefixes are documented but no fixed length, and
+  installation tokens may be JWT-shaped (`ghs_APPID_JWT`), so the pattern accepts variable length.
+  The AWS docs page fetched did not state the AKIA/ASIA prefixes; they are widely documented
+  conventions but were not re-verified here. npm/Slack/Google/Stripe patterns follow vendor
+  conventions and are not verified against vendor docs.
+- Redaction runs on normalized lines BEFORE rules, extraction, and any output, so findings, evidence,
+  excerpts and AI prompts never contain raw values. Only counts (`redactions.count`, `byKind`) are reported.
+- Tests build fake secrets by concatenation; a repository scan test asserts no ready-made secret
+  strings (strict kinds) and no `.env` files exist. `npm test`: 423 passed.
