@@ -53,6 +53,8 @@ export interface ErrorWindow {
   endLine: number;
   lines: LogLine[];
   stepName: string | null;
+  /** Job name when several jobs were analyzed (GitHub run source). */
+  job?: string;
 }
 
 export interface Evidence {
@@ -116,6 +118,8 @@ export interface Finding {
   explanation: string;
   suggestions: string[];
   step: string | null;
+  /** Job name when several jobs were analyzed; evidence line numbers refer to that job's log. */
+  job?: string;
   evidence: Evidence[];
   occurrences: number;
 }

@@ -15,6 +15,8 @@ const FindingSchema = z.object({
   explanation: z.string(),
   suggestions: z.array(z.string()),
   step: z.string().nullable(),
+  /** Set for GitHub runs: evidence line numbers refer to this job's log. */
+  job: z.string().nullable(),
   evidence: z.array(EvidenceSchema),
   occurrences: z.number().int().positive(),
 });

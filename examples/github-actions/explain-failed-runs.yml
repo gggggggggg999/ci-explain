@@ -1,0 +1,57 @@
+# Example: explain failed runs of another workflow in the job summary.
+#
+# STATUS: needs manual verification. This file was only validated as YAML and checked against the
+# GitHub Actions documentation; it has NOT been run in a real repository yet.
+#
+# Read docs/GITHUB-ACTIONS.md before using it, especially the security notes.
+
+name: Explain failed runs
+
+on:
+  workflow_run:
+    # Replace with the exact name(s) of the workflow(s) you want to explain.
+    workflows: ['CI']
+    types: [completed]
+
+# Least privilege: reading workflow runs and their logs is all this job needs.
+permissions:
+  actions: read
+
+jobs:
+  explain:
+    # Only react to failures.
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+
+      # This checks out the ci-explain tool itself at a commit YOU pin, NOT the pull request's code.
+      # Never check out or run code from the pull request in a workflow_run workflow.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: gggggggggg999/ci-explain
+          # Replace with a full 40-character commit SHA of a ci-explain revision you reviewed.
+          ref: REPLACE_WITH_FULL_COMMIT_SHA
+          path: ci-explain
+          persist-credentials: false
+
+      - name: Build ci-explain
+        working-directory: ci-explain
+        run: |
+          npm ci
+          npm run build
+
+      - name: Explain the failed run
+        env:
+          # Values from the event are passed through env, never interpolated into the script.
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          REPO: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node ci-explain/dist/cli/main.js github \
+            --repo "$REPO" --run "$RUN_ID" --format markdown \
+            > "$RUNNER_TEMP/explanation.md"
+          cat "$RUNNER_TEMP/explanation.md" >> "$GITHUB_STEP_SUMMARY"

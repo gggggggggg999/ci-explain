@@ -1,7 +1,14 @@
 import type { Readable } from 'node:stream';
 import { analyzeLog } from '../core/analyze.js';
 import { renderExcerpt } from '../core/excerpt.js';
+import { mergeJobResults } from '../core/merge.js';
 import { buildReport } from '../core/report.js';
+import {
+  DEFAULT_API_URL,
+  DEFAULT_MAX_JOBS,
+  fetchFailedJobLogs,
+  GithubError,
+} from '../io/github.js';
 import { DEFAULT_MAX_BYTES, InputError, readInput } from '../io/read-input.js';
 import { OutputFileError, writeFileSafely } from '../io/write-output.js';
 import { explainWithLlm } from '../llm/explain.js';
@@ -49,19 +56,91 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
       io.stdout.write(`${readVersion()}\n`);
       return EXIT.OK;
     }
-    if (opts.positionals.length !== 1) {
-      throw new UsageError('Expected exactly one input: a log file path, or "-" for stdin.');
+    const isGithub = opts.positionals[0] === 'github';
+    if (!isGithub && (opts.repo || opts.run || opts.maxJobs || opts.githubApiUrl)) {
+      throw new UsageError(
+        '--repo, --run, --max-jobs and --github-api-url are only for "ci-explain github".',
+      );
     }
-    const source = opts.positionals[0] as string;
-    if (source === '-' && io.stdin.isTTY) {
-      throw new UsageError('stdin is a terminal. Pipe a log into ci-explain, or pass a file path.');
+    const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
+
+    interface LoadedInput {
+      name: string | null;
+      text: string;
+      truncated: boolean;
+      firstLineNumber: number;
+    }
+    let sourceKind: 'file' | 'stdin' | 'github-run';
+    let inputs: LoadedInput[];
+
+    if (isGithub) {
+      if (opts.positionals.length !== 1) {
+        throw new UsageError('"ci-explain github" takes no other positional arguments.');
+      }
+      if (!opts.repo || !opts.run) {
+        throw new UsageError('"ci-explain github" needs --repo <owner/name> and --run <run-id>.');
+      }
+      const token = io.env.GITHUB_TOKEN;
+      if (!token) {
+        throw new UsageError(
+          '"ci-explain github" needs a token in the GITHUB_TOKEN environment variable (never pass it as an argument).',
+        );
+      }
+      const apiUrl = opts.githubApiUrl ?? DEFAULT_API_URL;
+      let apiHost = apiUrl;
+      try {
+        apiHost = new URL(apiUrl).host;
+      } catch {
+        throw new UsageError('--github-api-url is not a valid URL.');
+      }
+      io.stderr.write(
+        `Contacting ${apiHost} to download the logs of the failed jobs of run ${opts.run} (token from GITHUB_TOKEN).\n`,
+      );
+      const logs = await fetchFailedJobLogs({
+        repo: opts.repo,
+        runId: opts.run,
+        token,
+        apiUrl,
+        maxJobs: opts.maxJobs ?? DEFAULT_MAX_JOBS,
+        maxBytesPerJob: maxBytes,
+        ...(io.fetch ? { fetchImpl: io.fetch } : {}),
+      });
+      if (logs.failedJobCount > logs.jobs.length) {
+        io.stderr.write(
+          `Note: ${logs.failedJobCount} jobs failed; analyzing the first ${logs.jobs.length}. Use --max-jobs to change this.\n`,
+        );
+      }
+      inputs = logs.jobs.map((j) => ({
+        name: j.jobName,
+        text: j.text,
+        truncated: j.truncated,
+        firstLineNumber: j.firstLineNumber,
+      }));
+      if (inputs.every((i) => i.text.trim() === '')) {
+        throw new GithubError('GitHub returned empty logs for the failed jobs.');
+      }
+      sourceKind = 'github-run';
+    } else {
+      if (opts.positionals.length !== 1) {
+        throw new UsageError(
+          'Expected exactly one input: a log file path, "-" for stdin, or the "github" command.',
+        );
+      }
+      const source = opts.positionals[0] as string;
+      if (source === '-' && io.stdin.isTTY) {
+        throw new UsageError(
+          'stdin is a terminal. Pipe a log into ci-explain, or pass a file path.',
+        );
+      }
+      const input = await readInput(source, maxBytes, io.stdin);
+      if (input.text.trim() === '') {
+        throw new InputError('The input is empty: there is nothing to analyze.');
+      }
+      inputs = [{ name: null, ...input }];
+      sourceKind = source === '-' ? 'stdin' : 'file';
     }
 
-    const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
-    const input = await readInput(source, maxBytes, io.stdin);
-    if (input.text.trim() === '')
-      throw new InputError('The input is empty: there is nothing to analyze.');
-    if (input.truncated) {
+    if (inputs.some((i) => i.truncated)) {
       io.stderr.write(
         `Note: input exceeded --max-bytes (${maxBytes}); only the end of it was analyzed. ` +
           'Line numbers still refer to the original input. Use --max-bytes to change the limit.\n',
@@ -73,13 +152,22 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
       );
     }
 
-    const result = analyzeLog(input.text, {
-      maxFindings: opts.maxFindings,
-      redact: !opts.noRedact,
-      redactPii: opts.redactPii,
-      inputTruncated: input.truncated,
-      firstLineNumber: input.firstLineNumber,
-    });
+    const analyzeOne = (input: LoadedInput, redact: boolean, maxFindings: number) =>
+      analyzeLog(input.text, {
+        maxFindings,
+        redact,
+        redactPii: opts.redactPii,
+        inputTruncated: input.truncated,
+        firstLineNumber: input.firstLineNumber,
+      });
+    const analyzeAll = (redact: boolean) => {
+      if (!isGithub) return analyzeOne(inputs[0] as LoadedInput, redact, opts.maxFindings);
+      return mergeJobResults(
+        inputs.map((i) => ({ job: i.name ?? '', result: analyzeOne(i, redact, opts.maxFindings) })),
+        opts.maxFindings,
+      );
+    };
+    const result = analyzeAll(!opts.noRedact);
     const version = readVersion();
 
     if (opts.showPrompt) {
@@ -137,19 +225,13 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
 
     const report = buildReport(result, {
       toolVersion: version,
-      sourceKind: source === '-' ? 'stdin' : 'file',
+      sourceKind,
       llm,
     });
 
     if (opts.exportExcerpt) {
       // The excerpt is always redacted, even when --no-redact was used for the terminal output.
-      const safe = opts.noRedact
-        ? analyzeLog(input.text, {
-            redact: true,
-            redactPii: opts.redactPii,
-            firstLineNumber: input.firstLineNumber,
-          })
-        : result;
+      const safe = opts.noRedact ? analyzeAll(true) : result;
       await writeFileSafely(opts.exportExcerpt, renderExcerpt(safe, version), opts.force);
       io.stderr.write(
         `Excerpt written to ${opts.exportExcerpt}. Review it manually before sharing: redaction is pattern-based.\n`,
@@ -166,6 +248,10 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
     if (err instanceof UsageError) {
       io.stderr.write(`Error: ${err.message}\nRun "ci-explain --help" for usage.\n`);
       return EXIT.USAGE;
+    }
+    if (err instanceof GithubError) {
+      io.stderr.write(`Error: ${err.message}\n`);
+      return EXIT.EXTERNAL;
     }
     if (err instanceof InputError || err instanceof OutputFileError) {
       io.stderr.write(`Error: ${err.message}\n`);

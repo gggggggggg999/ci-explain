@@ -35,7 +35,9 @@ export function renderText(report: Report, options: { color: boolean }): string 
   report.findings.forEach((f, i) => {
     const count = f.occurrences > 1 ? ` (${f.occurrences} occurrences)` : '';
     out.push(`${i + 1}. ${s.confidence(f.confidence)} ${s.bold(f.title)}${count}`);
-    out.push(`   ${s.dim(f.ruleId)}${f.step ? s.dim(` · step: ${f.step}`) : ''}`);
+    out.push(
+      `   ${s.dim(f.ruleId)}${f.job ? s.dim(` · job: ${f.job}`) : ''}${f.step ? s.dim(` · step: ${f.step}`) : ''}`,
+    );
     out.push(`   ${f.explanation}`);
     out.push('   Evidence (line numbers refer to the original log):');
     const width = String(Math.max(...f.evidence.map((e) => e.line))).length;

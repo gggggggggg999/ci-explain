@@ -27,6 +27,7 @@ export function buildReport(result: AnalysisResult, ctx: ReportContext): Report 
       explanation: f.explanation,
       suggestions: f.suggestions,
       step: f.step,
+      job: f.job ?? null,
       evidence: f.evidence,
       occurrences: f.occurrences,
     })),

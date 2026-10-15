@@ -65,6 +65,7 @@
   strings (strict kinds) and no `.env` files exist. `npm test`: 423 passed.
 
 ## Stage 5 — CLI and output formats (2026-10-15)
+
 - `ci-explain <file|->` with `--format text|markdown|json`, `--max-findings`, `--max-bytes`,
   `--no-color`/`NO_COLOR`, `--no-redact` (text only, warns), `--redact-pii`, `--export-excerpt`, `--force`,
   `--help`, `--version`. Exit codes 0/1/2/3 (4 and 5 arrive with the GitHub and AI stages).
@@ -82,6 +83,7 @@
   breaks "am I the entry module" checks.
 
 ## Stage 6 — optional AI layer (2026-10-15)
+
 - Off by default; `--llm` needs `CI_EXPLAIN_LLM_API_KEY` (env only), `--llm-base-url` and `--llm-model`
   (or the matching env vars). Missing pieces fail with exit 2, never silently.
 - `--show-prompt` prints the exact redacted messages and sends nothing (tested with a stubbed global fetch).
@@ -94,3 +96,17 @@
   errors carry fixed messages (no key, headers, prompt or body); failures degrade to layer-1 output
   (`--llm-required` makes it exit 5).
 - ALL AI tests use mocks. No real provider call was made; no compatibility is claimed.
+
+## Stage 7 — GitHub source and workflow example (2026-10-15)
+- `ci-explain github --repo owner/name --run <id>` (token from `GITHUB_TOKEN` only). Official REST endpoints
+  checked 2026-10-15: list jobs for a run, download job logs (302 to a link that expires after 1 minute),
+  `X-GitHub-Api-Version: 2026-03-10`. Redirects are manual; the token is never sent to another host
+  (tested with two local servers); http allowed only for localhost; size caps, timeouts, 401/403/404/410,
+  primary/secondary rate limits, expired logs. Failed jobs are analyzed separately (default max 3) and merged;
+  each finding carries its job name because line numbers refer to that job's log.
+- Log retention verified in GitHub docs: 90 days by default, 1 to 400 days for private repositories.
+- Job summary limit verified in GitHub docs: 1 MiB per step; Markdown output capped at 1,000,000 bytes.
+- Example workflow validated as YAML and by tests (minimal permissions, pinned SHAs, no event data in `run:`,
+  no PR checkout). NOT run in a real repository: marked "needs manual verification". `yaml` added as a dev dependency
+  (ISC, no dependencies) for those tests.
+- All GitHub tests use local mock HTTP servers; no real GitHub request was made by the tool.

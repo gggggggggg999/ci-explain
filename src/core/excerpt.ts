@@ -15,6 +15,7 @@ export function renderExcerpt(result: AnalysisResult, toolVersion: string): stri
   ).length;
   result.windows.forEach((w, i) => {
     if (i > 0) out.push('...');
+    if (w.job && w.job !== result.windows[i - 1]?.job) out.push(`# job: ${w.job}`);
     for (const l of w.lines) {
       const rep = l.repeat > 1 ? `  (x${l.repeat})` : '';
       out.push(`${String(l.n).padStart(width)} | ${l.text}${rep}`);

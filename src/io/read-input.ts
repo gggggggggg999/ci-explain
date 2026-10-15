@@ -27,7 +27,12 @@ function countNewlines(buf: Buffer): number {
  * The tail is kept because the cause of a CI failure is usually near the end. Line numbers
  * of the kept part still refer to the original input.
  */
-export async function readStreamTail(stream: Readable, maxBytes: number): Promise<InputResult> {
+export async function readStreamTail(
+  stream: Readable,
+  maxBytes: number,
+  /** Hard cap on the total bytes read; exceeding it aborts with an InputError. */
+  maxTotalBytes = Infinity,
+): Promise<InputResult> {
   const chunks: Buffer[] = [];
   let kept = 0;
   let droppedBytes = 0;
@@ -37,6 +42,10 @@ export async function readStreamTail(stream: Readable, maxBytes: number): Promis
   for await (const raw of stream) {
     const chunk = Buffer.isBuffer(raw) ? raw : Buffer.from(raw as string);
     total += chunk.length;
+    if (total > maxTotalBytes) {
+      stream.destroy();
+      throw new InputError('The input is too large to download safely.');
+    }
     chunks.push(chunk);
     kept += chunk.length;
     while (chunks.length > 1 && kept - (chunks[0] as Buffer).length >= maxBytes) {

@@ -52,7 +52,7 @@ export function renderMarkdown(report: Report, options: { maxBytes?: number } = 
     out.push(`### ${i + 1}. ${escapeMarkdown(f.title)}${count}`);
     out.push('');
     out.push(
-      `Confidence: **${f.confidence}** · rule: \`${f.ruleId.replace(/`/g, '')}\`${f.step ? ` · step: ${escapeMarkdown(f.step)}` : ''}`,
+      `Confidence: **${f.confidence}** · rule: \`${f.ruleId.replace(/`/g, '')}\`${f.job ? ` · job: ${escapeMarkdown(f.job)}` : ''}${f.step ? ` · step: ${escapeMarkdown(f.step)}` : ''}`,
     );
     out.push('');
     out.push(escapeMarkdown(f.explanation));

@@ -47,29 +47,36 @@ export function buildPrompt(
   const budget = options.maxInputBytes ?? DEFAULT_MAX_INPUT_BYTES;
 
   // Newest windows first: the cause is usually near the end of the failed step.
-  const picked: { n: number; text: string }[][] = [];
+  type Line = { n: number; text: string };
+  const picked: { job: string | undefined; lines: Line[] }[] = [];
   let used = 0;
   let included = 0;
   outer: for (const w of [...result.windows].reverse()) {
-    const chunk: { n: number; text: string }[] = [];
+    const chunk: Line[] = [];
     for (const l of [...w.lines].reverse()) {
       const text = neutralizeMarkers(l.text);
       const cost = Buffer.byteLength(text, 'utf8') + 12;
       if (used + cost > budget) {
-        if (chunk.length > 0) picked.push(chunk.reverse());
+        if (chunk.length > 0) picked.push({ job: w.job, lines: chunk.reverse() });
         break outer;
       }
       used += cost;
       included++;
       chunk.push({ n: l.n, text });
     }
-    picked.push(chunk.reverse());
+    picked.push({ job: w.job, lines: chunk.reverse() });
   }
   picked.reverse();
 
-  const excerpt = picked
-    .map((chunk) => chunk.map((l) => `${String(l.n).padStart(5)} | ${l.text}`).join('\n'))
-    .join('\n   ...\n');
+  const excerptParts: string[] = [];
+  picked.forEach((p, i) => {
+    if (i > 0) excerptParts.push('   ...');
+    if (p.job && p.job !== picked[i - 1]?.job) {
+      excerptParts.push(`[job: ${neutralizeMarkers(p.job).replace(/\s+/g, ' ').slice(0, 100)}]`);
+    }
+    for (const l of p.lines) excerptParts.push(`${String(l.n).padStart(5)} | ${l.text}`);
+  });
+  const excerpt = excerptParts.join('\n');
 
   const findings =
     result.findings.length === 0

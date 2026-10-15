@@ -13,6 +13,10 @@ export interface CliOptions {
   redactPii: boolean;
   exportExcerpt: string | null;
   force: boolean;
+  repo: string | null;
+  run: string | null;
+  maxJobs: number | null;
+  githubApiUrl: string | null;
   llm: boolean;
   showPrompt: boolean;
   llmBaseUrl: string | null;
@@ -54,6 +58,10 @@ export function parseCliArgs(argv: string[]): CliOptions {
         'redact-pii': { type: 'boolean' },
         'export-excerpt': { type: 'string' },
         force: { type: 'boolean' },
+        repo: { type: 'string' },
+        run: { type: 'string' },
+        'max-jobs': { type: 'string' },
+        'github-api-url': { type: 'string' },
         llm: { type: 'boolean' },
         'show-prompt': { type: 'boolean' },
         'llm-base-url': { type: 'string' },
@@ -101,6 +109,10 @@ export function parseCliArgs(argv: string[]): CliOptions {
     redactPii: v['redact-pii'] ?? false,
     exportExcerpt: v['export-excerpt'] ?? null,
     force: v.force ?? false,
+    repo: v.repo ?? null,
+    run: v.run ?? null,
+    maxJobs: v['max-jobs'] ? positiveInt('--max-jobs', v['max-jobs']) : null,
+    githubApiUrl: v['github-api-url'] ?? null,
     llm: v.llm ?? false,
     showPrompt: v['show-prompt'] ?? false,
     llmBaseUrl: v['llm-base-url'] ?? null,
@@ -123,6 +135,18 @@ export const HELP_TEXT = `ci-explain - explain why a CI build failed, with the l
 Usage:
   ci-explain <logfile> [options]
   <command> | ci-explain - [options]
+  ci-explain github --repo <owner/name> --run <run-id> [options]
+
+GitHub source (official REST API; the only mode besides --llm that uses the network):
+  github                         Download the logs of the failed jobs of a workflow run.
+                                 Needs a token in the GITHUB_TOKEN environment variable
+                                 (never pass it as an argument). To analyze a local file named
+                                 "github", write ./github.
+  --repo <owner/name>            Repository
+  --run <id>                     Workflow run ID
+  --max-jobs <n>                 Failed jobs to analyze (default: 3)
+  --github-api-url <url>         API base URL for GitHub Enterprise Server (https only;
+                                 the token is sent to this host)
 
 Options:
   --format <text|markdown|json>  Output format (default: text)
@@ -160,5 +184,6 @@ Exit codes:
   1  unexpected error
   2  invalid arguments
   3  input unreadable, empty, or unsupported
+  4  external source (GitHub API) failed
   5  --llm-required was set and the AI layer was unavailable
 `;
