@@ -113,6 +113,7 @@
 - All GitHub tests use local mock HTTP servers; no real GitHub request was made by the tool.
 
 ## Stage 8 — complete rule catalog, contributor docs, performance (2026-10-15)
+
 - Catalog now has 34 rules, covering every item of the target list. New ones: pnpm/yarn frozen lockfile,
   engines, node-gyp, pip, Docker (build failed, rate limit, COPY not found), exit 137, job timeout,
   job canceled, network codes, GitHub API rate limit, git permission denied, checkout/submodule, missing env.
