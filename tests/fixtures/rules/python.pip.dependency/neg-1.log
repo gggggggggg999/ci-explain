@@ -1,0 +1,2 @@
+Requirement already satisfied: requests in ./venv/lib/python3.12/site-packages (2.31.0)
+Successfully installed requests-2.31.0 urllib3-2.2.1

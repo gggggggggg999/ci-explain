@@ -1,0 +1,5 @@
+------
+ > [3/5] RUN pip install -r requirements.txt:
+1.204 ERROR: No matching distribution found for zzz-demo-missing-pkg
+------
+ERROR: failed to solve: process "/bin/sh -c pip install -r requirements.txt" did not complete successfully: exit code: 1

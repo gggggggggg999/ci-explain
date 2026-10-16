@@ -1,0 +1,2 @@
+remote: Permission to example-org/demo-repo.git denied to demo-bot.
+fatal: unable to access 'https://github.com/example-org/demo-repo.git/': The requested URL returned error: 403

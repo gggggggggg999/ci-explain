@@ -1,0 +1,5 @@
+gyp info spawn make
+gyp ERR! build error
+gyp ERR! stack Error: `make` failed with exit code: 2
+gyp ERR! stack     at ChildProcess.onExit (/usr/lib/node_modules/npm/node_modules/node-gyp/lib/build.js:203:23)
+gyp ERR! System Linux 6.5.0

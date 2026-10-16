@@ -1,0 +1,6 @@
+npm warn EBADENGINE Unsupported engine {
+npm warn EBADENGINE   package: 'demo-pkg@1.0.0',
+npm warn EBADENGINE   required: { node: '>=99' },
+npm warn EBADENGINE   current: { node: 'v22.12.0', npm: '10.9.0' }
+npm warn EBADENGINE }
+added 10 packages in 2s

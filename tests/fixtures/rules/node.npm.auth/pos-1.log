@@ -1,0 +1,2 @@
+npm error code E401
+npm error 401 Unauthorized - GET https://registry.example.invalid/@demo%2fprivate-lib - Unable to authenticate, need: Basic realm="registry"

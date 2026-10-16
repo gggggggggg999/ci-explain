@@ -1,0 +1,2 @@
+Error: ENOSPC: System limit for number of file watchers reached, watch '/home/runner/work/demo/demo/src'
+Disk usage: 40% used, 12G free

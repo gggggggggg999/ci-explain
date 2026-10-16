@@ -1,0 +1,5 @@
+/home/runner/work/demo/demo/src/b.ts
+  10:1   error  Unexpected console statement  no-console
+  22:14  error  Missing return type           @typescript-eslint/explicit-function-return-type
+
+✖ 2 problems (2 errors, 0 warnings)

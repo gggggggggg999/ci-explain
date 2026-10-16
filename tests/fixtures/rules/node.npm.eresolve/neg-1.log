@@ -1,0 +1,5 @@
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: demo-app@1.0.0
+npm warn Found: react@18.2.0
+added 120 packages, and audited 121 packages in 4s
+found 0 vulnerabilities

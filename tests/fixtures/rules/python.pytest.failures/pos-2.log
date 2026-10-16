@@ -1,0 +1,4 @@
+=========================== short test summary info ============================
+FAILED tests/test_api.py::test_login - AssertionError: 401 != 200
+FAILED tests/test_api.py::test_logout - KeyError: 'session'
+======================== 2 failed, 5 passed in 1.23s =========================

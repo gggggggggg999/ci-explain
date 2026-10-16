@@ -1,0 +1,11 @@
+node:internal/modules/cjs/loader:1252
+  throw err;
+  ^
+
+Error: Cannot find module 'left-pad-demo'
+Require stack:
+- /home/runner/work/demo/demo/src/index.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1249:15) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/home/runner/work/demo/demo/src/index.js' ]
+}

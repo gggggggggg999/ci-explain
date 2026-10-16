@@ -1,0 +1,2 @@
+Heap usage: 120 MB, memory usage within limits
+Tip: set --max-old-space-size to avoid out of memory errors in large builds

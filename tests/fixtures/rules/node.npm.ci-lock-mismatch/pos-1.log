@@ -1,0 +1,8 @@
+npm error code EUSAGE
+npm error
+npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
+npm error
+npm error Invalid: lock file's is-odd@3.0.1 does not satisfy is-odd@2.0.0
+npm error Invalid: lock file's is-number@6.0.0 does not satisfy is-number@4.0.0
+npm error
+npm error Clean install a project

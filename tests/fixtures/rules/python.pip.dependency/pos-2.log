@@ -1,0 +1,7 @@
+ERROR: Cannot install requests==2.31.0 and urllib3==1.25.0 because these package versions have conflicting dependencies.
+
+The conflict is caused by:
+    The user requested urllib3==1.25.0
+    requests 2.31.0 depends on urllib3<3 and >=1.21.1
+
+ERROR: ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/

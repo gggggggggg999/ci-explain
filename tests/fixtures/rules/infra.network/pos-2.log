@@ -1,0 +1,3 @@
+npm error code ECONNRESET
+npm error network aborted
+npm error getaddrinfo EAI_AGAIN registry.example.invalid

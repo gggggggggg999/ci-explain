@@ -1,0 +1,3 @@
+Checking formatting...
+[warn] Ignored unknown option { foo: true }. Did you mean { tabWidth: 2 }?
+All matched files use Prettier code style!

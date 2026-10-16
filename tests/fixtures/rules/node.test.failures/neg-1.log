@@ -1,0 +1,4 @@
+PASS src/sum.test.js
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+Tests:       0 failed, 4 passed, 4 total

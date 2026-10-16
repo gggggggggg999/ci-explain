@@ -1,0 +1,2 @@
+tar: dist/bundle.js: Cannot write: No space left on device
+tar: Exiting with failure status due to previous errors

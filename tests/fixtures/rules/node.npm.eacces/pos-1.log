@@ -1,0 +1,5 @@
+npm error code EACCES
+npm error syscall mkdir
+npm error path /usr/local/lib/node_modules/demo-cli
+npm error errno -13
+npm error Error: EACCES: permission denied, mkdir '/usr/local/lib/node_modules/demo-cli'

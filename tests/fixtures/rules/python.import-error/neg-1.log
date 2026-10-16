@@ -1,0 +1,2 @@
+Error: Cannot find module 'yaml'
+# ImportError handling is covered by the tests below

@@ -1,0 +1,2 @@
+Error: EACCES: permission denied, open '/home/runner/work/demo/demo/build/output.json'
+    at Object.openSync (node:fs:573:18)

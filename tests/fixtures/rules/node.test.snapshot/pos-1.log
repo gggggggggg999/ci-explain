@@ -1,0 +1,10 @@
+ FAIL  a.test.js > snap
+Error: Snapshot `snap 1` mismatched
+
+- Expected
++ Received
+
+- { "a": 2 }
++ {
++   "a": 1,
++ }

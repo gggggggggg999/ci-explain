@@ -1,0 +1,2 @@
+Checking file access for build/output.json
+EACCES is the POSIX error code for denied access (documentation note).

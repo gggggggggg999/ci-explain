@@ -1,0 +1,2 @@
+Error: ENOSPC: no space left on device, write
+    at Object.writeSync (node:fs:930:3)

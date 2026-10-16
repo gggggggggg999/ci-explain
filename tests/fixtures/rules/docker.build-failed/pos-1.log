@@ -1,0 +1,9 @@
+#8 [4/6] RUN npm ci
+#8 0.331 npm error code EUSAGE
+#8 ERROR: process "/bin/sh -c npm ci" did not complete successfully: exit code: 1
+------
+ > [4/6] RUN npm ci:
+0.331 npm error code EUSAGE
+------
+Dockerfile:5
+ERROR: failed to solve: process "/bin/sh -c npm ci" did not complete successfully: exit code: 1

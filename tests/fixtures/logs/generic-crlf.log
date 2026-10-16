@@ -1,0 +1,4 @@
+build started
+downloading  10%downloading  50%downloading 100%
+src/app.ts(3,5): error TS2322: Type 'string' is not assignable to type 'number'.
+build failed

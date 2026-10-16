@@ -1,0 +1,19 @@
+﻿2025-01-01T10:00:00.1000000Z Current runner version: '2.0.0'
+2025-01-01T10:00:00.1100000Z ##[group]Runner Image
+2025-01-01T10:00:00.1200000Z Image: example
+2025-01-01T10:00:00.1300000Z ##[endgroup]
+2025-01-01T10:00:01.0000000Z ##[group]Run actions/checkout@v1
+2025-01-01T10:00:01.0100000Z with:
+2025-01-01T10:00:01.0200000Z   repository: example/demo
+2025-01-01T10:00:01.0300000Z ##[endgroup]
+2025-01-01T10:00:01.5000000Z ##[group]Getting Git version info
+2025-01-01T10:00:01.5100000Z git version 2.40.0
+2025-01-01T10:00:01.5200000Z ##[endgroup]
+2025-01-01T10:00:02.0000000Z ##[group]Run npm ci
+2025-01-01T10:00:02.0100000Z [36;1mnpm ci[0m
+2025-01-01T10:00:02.0200000Z ##[endgroup]
+2025-01-01T10:00:03.0000000Z npm error code EUSAGE
+2025-01-01T10:00:03.0100000Z npm error `npm ci` can only install packages when your package.json and package-lock.json are in sync.
+2025-01-01T10:00:03.0200000Z ##[error]Process completed with exit code 1.
+2025-01-01T10:00:03.5000000Z Post job cleanup.
+2025-01-01T10:00:03.6000000Z Cleaning up orphan processes

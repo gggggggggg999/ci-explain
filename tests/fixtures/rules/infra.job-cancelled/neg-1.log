@@ -1,0 +1,2 @@
+Operation canceled: user pressed ctrl-c in the demo script
+The operation was canceled by the demo cleanup handler

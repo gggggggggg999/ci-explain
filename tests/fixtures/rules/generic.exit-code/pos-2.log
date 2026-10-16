@@ -1,0 +1,2 @@
+./deploy.sh: line 3: demo-tool: command not found
+##[error]Process completed with exit code 127.

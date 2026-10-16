@@ -1,0 +1,3 @@
+#5 [2/6] RUN npm ci
+#5 DONE 3.2s
+ERROR: failed to solve: failed to compute cache key: failed to calculate checksum of ref abc::xyz: "/dist/app.js": not found

@@ -1,0 +1,5 @@
+gyp ERR! find Python You need to install the latest version of Python.
+gyp ERR! find Python Python is not set from command line or npm configuration
+gyp ERR! configure error
+gyp ERR! stack Error: Could not find any Python installation to use
+gyp ERR! stack     at PythonFinder.fail (/usr/lib/node_modules/npm/node_modules/node-gyp/lib/find-python.js:330:47)

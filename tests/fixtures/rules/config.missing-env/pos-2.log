@@ -1,0 +1,2 @@
+Error: Missing required environment variable: DATABASE_URL
+    at loadConfig (/home/runner/work/demo/demo/src/config.js:10:11)

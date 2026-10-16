@@ -1,0 +1,7 @@
+src/index.ts:3:7 - error TS2322: Type 'string' is not assignable to type 'number'.
+
+3 const a: number = "x";
+        ~
+
+
+Found 1 error in src/index.ts:3

@@ -1,0 +1,4 @@
+ FAIL  a.test.js > slow
+Error: Test timed out in 50ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ a.test.js:4:1

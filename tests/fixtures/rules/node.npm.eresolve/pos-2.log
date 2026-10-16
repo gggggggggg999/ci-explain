@@ -1,0 +1,12 @@
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE could not resolve
+npm ERR!
+npm ERR! While resolving: demo-lib@2.0.0
+npm ERR! Found: vue@2.7.14
+npm ERR! node_modules/vue
+npm ERR!   vue@"2.7.14" from the root project
+npm ERR!
+npm ERR! Could not resolve dependency:
+npm ERR! peer vue@"^3.0.0" from demo-plugin@1.4.0
+npm ERR! node_modules/demo-plugin
+npm ERR!   demo-plugin@"1.4.0" from the root project

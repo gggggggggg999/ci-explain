@@ -1,0 +1,2 @@
+retry policy: ETIMEDOUT_RETRIES=3 configured
+Download finished without network errors

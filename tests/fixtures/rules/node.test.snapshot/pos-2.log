@@ -1,0 +1,10 @@
+  ● renders › matches snapshot
+
+    expect(received).toMatchSnapshot()
+
+    Snapshot name: `renders matches snapshot 1`
+
+    - Snapshot  - 1
+    + Received  + 1
+
+Snapshots:   1 failed, 1 total

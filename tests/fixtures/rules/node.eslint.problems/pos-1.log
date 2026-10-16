@@ -1,0 +1,7 @@
+/home/runner/work/demo/demo/src/a.js
+  1:5  error    'unused' is assigned a value but never used   no-unused-vars
+  2:5  error    'z' is assigned a value but never used        no-unused-vars
+  2:5  warning  'z' is never reassigned. Use 'const' instead  prefer-const
+
+✖ 3 problems (2 errors, 1 warning)
+  0 errors and 1 warning potentially fixable with the `--fix` option.

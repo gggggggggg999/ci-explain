@@ -1,0 +1,2 @@
+Step 4/8 : COPY package.json ./
+COPY failed: file not found in build context or excluded by .dockerignore: stat package.json: file does not exist

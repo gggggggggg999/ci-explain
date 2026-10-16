@@ -1,0 +1,8 @@
+node:internal/modules/esm/resolve:857
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'chalk-demo' imported from /home/runner/work/demo/demo/src/main.mjs
+    at packageResolve (node:internal/modules/esm/resolve:857:9) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
