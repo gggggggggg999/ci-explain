@@ -24,6 +24,7 @@ function parseTsError(line: LogLine): TsError | null {
   if (!m) return null;
   let head = text.slice(0, idx).trim();
   if (head.endsWith(' -')) head = head.slice(0, -2);
+  if (head.endsWith(':')) head = head.slice(0, -1);
   const file = head.replace(LOCATION_SUFFIX, '');
   return { line, file, code: m[1] ?? '', message: m[2] ?? '' };
 }

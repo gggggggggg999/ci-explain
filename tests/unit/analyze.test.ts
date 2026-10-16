@@ -156,3 +156,18 @@ describe('ReDoS resistance', () => {
     expect(performance.now() - start).toBeLessThan(3000);
   });
 });
+
+describe('TypeScript rule explanation', () => {
+  it('names the file without location punctuation and counts distinct files', () => {
+    const r = analyzeLog(
+      gha('tsc', [
+        "src/index.ts(12,7): error TS2322: Type 'string' is not assignable to type 'number'.",
+        "src/util.ts(4,3): error TS2304: Cannot find name 'cfg'.",
+        "src/util.ts(9,10): error TS2304: Cannot find name 'cfg'.",
+      ]),
+    );
+    const f = r.findings[0]!;
+    expect(f.explanation).toContain('3 errors across 2 files');
+    expect(f.explanation).toContain('TS2322 in src/index.ts: Type');
+  });
+});

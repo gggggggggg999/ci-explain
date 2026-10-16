@@ -1,0 +1,12 @@
+2025-01-01T10:00:00.1000000Z ##[group]Run actions/checkout@v1
+2025-01-01T10:00:00.2000000Z ##[endgroup]
+2025-01-01T10:00:02.0000000Z ##[group]Run npm run build
+2025-01-01T10:00:02.0100000Z npm run build
+2025-01-01T10:00:02.0200000Z ##[endgroup]
+2025-01-01T10:00:03.0000000Z > demo-app@1.0.0 build
+2025-01-01T10:00:03.0100000Z > tsc -p tsconfig.json
+2025-01-01T10:00:05.0000000Z src/index.ts(12,7): error TS2322: Type 'string' is not assignable to type 'number'.
+2025-01-01T10:00:05.0100000Z src/util.ts(4,3): error TS2304: Cannot find name 'cfg'.
+2025-01-01T10:00:05.0200000Z src/util.ts(9,10): error TS2304: Cannot find name 'cfg'.
+2025-01-01T10:00:05.0300000Z npm error Lifecycle script `build` failed with error:
+2025-01-01T10:00:05.0400000Z ##[error]Process completed with exit code 2.
