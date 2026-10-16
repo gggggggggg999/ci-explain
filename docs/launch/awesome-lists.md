@@ -1,0 +1,13 @@
+# Awesome lists and directories
+
+Found by search and by reading each list's contribution guide on 2026-10-16. **Do not submit anything until the
+project meets each list's conditions; the owner submits, not this tool.** Stars and age change; re-check.
+
+| List                                                                          | Conditions found in its contribution guide                                                                                                                                                                                                                                                                                    | Fit today                              |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| [sdras/awesome-actions](https://github.com/sdras/awesome-actions)             | Format `[Name](link)`, short one-line description, add at the end of the relevant category, one pull request per suggestion, useful PR title, link to the repository in the commit body. This list is about GitHub Actions tooling, and ci-explain has no Action (only an example workflow), so it probably does not fit yet. | Unlikely until a real Action exists    |
+| [sindresorhus/awesome-nodejs](https://github.com/sindresorhus/awesome-nodejs) | Project older than 30 days **and at least 100 stars**; must be generally useful ("not niche"); tested and documented; if similar to an existing entry, argue why it is better; format `[package](link) - Description.`; no marketing taglines; link to the GitHub repo; one PR per suggestion.                                | Not yet (needs 100 stars and 30 days)  |
+| [wmariuss/awesome-devops](https://github.com/wmariuss/awesome-devops)         | Public repo with an open-source license, **at least 100 stars and 6 months of history**, not archived, active in the last two years, official link without tracking parameters; one line per entry in the format `- [Name](url) - One sentence. \`oss\``; one tool per PR.                                                    | Not yet (needs 100 stars and 6 months) |
+
+Other lists exist (for example awesome-cicd-security focuses on CI/CD security). Read their contribution guides
+the same way before considering them. Never ask for stars or use any form of star trading; some lists check for it.
