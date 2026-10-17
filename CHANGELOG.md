@@ -3,6 +3,13 @@
 All notable changes are documented here. The JSON output has its own `schemaVersion`; changes to it
 are recorded here as well and require a new `schemaVersion`.
 
+## 0.1.3
+
+### Added
+
+- Composite GitHub Action (`action.yml`): `uses: gggggggggg999/ci-explain@<full-sha>` writes the explanation of a failed run to the job summary. Verified once in the project's own repository (2026-10-17); not published to the Marketplace.
+- README section "Use it in GitHub Actions".
+
 ## 0.1.2
 
 ### Changed

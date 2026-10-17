@@ -173,3 +173,10 @@ published or submitted anywhere; the project does not yet meet the star/age cond
 - npm: NOT published. `npm whoami` fails on this machine (not logged in); publishing needs the owner's own
   npm login and 2FA, which must be entered by the owner in their own terminal.
 - Not possible without the owner: real LLM test (no API key), publishing launch posts (no accounts).
+
+## Ease of use (2026-10-17)
+
+- `prepare` script: `npx --yes github:gggggggggg999/ci-explain#<tag>` builds and runs from GitHub (verified).
+- Composite action `action.yml` added and dogfooded: it ran successfully on a real failed run triggered by a
+  deliberately failing draft PR (closed afterwards). Fork PRs and private repositories were not tested.
+  Not published to the Marketplace. Release v0.1.3.

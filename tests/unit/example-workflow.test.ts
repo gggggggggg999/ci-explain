@@ -30,21 +30,16 @@ describe('examples/github-actions/explain-failed-runs.yml', () => {
     for (const u of uses) expect(u, u).toMatch(/@[0-9a-f]{40}$/);
   });
 
-  it('never interpolates event data directly into run scripts', () => {
+  it('has no run scripts of its own: event data only goes through action inputs', () => {
     for (const step of wf.jobs.explain?.steps ?? []) {
-      const script = typeof step.run === 'string' ? step.run : '';
-      expect(script).not.toContain('${{');
+      expect(step.run).toBeUndefined();
     }
   });
 
   it('does not check out the pull request (no head ref/sha/repository from the event)', () => {
     expect(text).not.toMatch(/github\.event\.(pull_request|workflow_run\.head)/);
     expect(text).not.toContain('pull_request_target');
-  });
-
-  it('does not persist credentials on checkout and writes only to the job summary', () => {
-    expect(text).toContain('persist-credentials: false');
-    expect(text).toContain('GITHUB_STEP_SUMMARY');
+    expect(text).not.toContain('actions/checkout');
   });
 
   it('states honestly how far it was verified', () => {

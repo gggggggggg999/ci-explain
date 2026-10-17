@@ -1,6 +1,6 @@
-# Example: explain failed runs of another workflow in the job summary.
+# Example: explain failed runs of another workflow in the job summary, using the ci-explain action.
 #
-# STATUS: partially verified. On 2026-10-17 this workflow ran successfully once in the author's own
+# STATUS: partially verified. On 2026-10-17 this setup ran successfully in the author's own
 # repository, triggered by a failed same-repository pull request run. Fork pull requests and
 # other setups have NOT been tested; review it before relying on it.
 #
@@ -25,34 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      # Pinned to a full commit SHA (the code of the ci-explain release you reviewed).
+      # This action runs ci-explain itself. It does NOT check out or run the pull request's code.
+      - uses: gggggggggg999/ci-explain@a56d8eec93d42db1ddf0b9278ca0378dcc04cbdf
         with:
-          node-version: '22'
-
-      # This checks out the ci-explain tool itself at a commit YOU pin, NOT the pull request's code.
-      # Never check out or run code from the pull request in a workflow_run workflow.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: gggggggggg999/ci-explain
-          # Replace with a full 40-character commit SHA of a ci-explain revision you reviewed.
-          ref: REPLACE_WITH_FULL_COMMIT_SHA
-          path: ci-explain
-          persist-credentials: false
-
-      - name: Build ci-explain
-        working-directory: ci-explain
-        run: |
-          npm ci
-          npm run build
-
-      - name: Explain the failed run
-        env:
-          # Values from the event are passed through env, never interpolated into the script.
-          RUN_ID: ${{ github.event.workflow_run.id }}
-          REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node ci-explain/dist/cli/main.js github \
-            --repo "$REPO" --run "$RUN_ID" --format markdown \
-            > "$RUNNER_TEMP/explanation.md"
-          cat "$RUNNER_TEMP/explanation.md" >> "$GITHUB_STEP_SUMMARY"
+          # Event values are passed as inputs; the action hands them to the script through env.
+          run-id: ${{ github.event.workflow_run.id }}

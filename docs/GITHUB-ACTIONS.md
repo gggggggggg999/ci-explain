@@ -53,6 +53,18 @@ access tokens on private repositories the REST docs state the `repo` scope; for 
 `--github-api-url` lets you point at GitHub Enterprise Server. The token is sent to whatever host you give, so
 only use hosts you trust (https is required; http only for localhost).
 
+## The composite action (easiest)
+
+The repository root contains [`action.yml`](../action.yml), a composite action. Using it as in the README
+runs ci-explain from the exact commit you pin: it sets up Node 22, builds ci-explain, runs
+`ci-explain github --format markdown` and appends the result to the job summary.
+
+Inputs: `run-id` (required), `repository` (default: the current repository), `token` (default:
+`github.token`), `max-findings` (default 3), `max-jobs` (default 3). Inputs reach the script through `env`, never
+through string interpolation, the setup-node action is pinned to a commit SHA, and the action never checks out
+or runs the pull request's code. It has been tested by running it in the author's own repository (see the status
+note above); it is not published to the Marketplace.
+
 ## The example workflow
 
 It triggers on `workflow_run` (type `completed`) of the workflow(s) you list, runs only when the conclusion
