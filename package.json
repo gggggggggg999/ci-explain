@@ -1,6 +1,6 @@
 {
   "name": "ci-explain",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Explain why your CI failed in seconds: evidence-first, works offline, secrets redacted, AI optional.",
   "type": "module",
   "license": "MIT",

@@ -3,6 +3,12 @@
 All notable changes are documented here. The JSON output has its own `schemaVersion`; changes to it
 are recorded here as well and require a new `schemaVersion`.
 
+## 0.1.2
+
+### Changed
+
+- Added a `prepare` script, so `npx --yes github:gggggggggg999/ci-explain#<tag>` builds and runs the tool straight from GitHub (verified on 2026-10-17). The package is still not published to the npm registry.
+
 ## 0.1.1
 
 ### Fixed

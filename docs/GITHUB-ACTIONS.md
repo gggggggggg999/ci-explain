@@ -90,5 +90,6 @@ that one job.
 ### Installing ci-explain in the workflow
 
 The example builds ci-explain from source at a commit you pin (`ref: REPLACE_WITH_FULL_COMMIT_SHA`).
-Replace the placeholder with a full 40-character SHA of a revision you reviewed. Once the package is
-published to npm, a pinned `npx` invocation can replace the checkout and build steps.
+Replace the placeholder with a full 40-character SHA of a revision you reviewed. A simpler alternative that needs no checkout is a pinned run straight from GitHub:
+`npx --yes github:gggggggggg999/ci-explain#<tag> github --repo "$REPO" --run "$RUN_ID" --format markdown`
+(it builds the tool on first use). Pin a release tag, and ideally verify the commit it points to.
