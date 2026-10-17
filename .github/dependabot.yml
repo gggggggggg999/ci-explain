@@ -4,6 +4,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # typescript-eslint does not support TypeScript >= 6.1 yet (see docs/DECISIONS.md D-005).
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
+      # @types/node must match the oldest supported Node.js major (22).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:

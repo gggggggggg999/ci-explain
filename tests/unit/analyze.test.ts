@@ -171,3 +171,16 @@ describe('TypeScript rule explanation', () => {
     expect(f.explanation).toContain('TS2322 in src/index.ts: Type');
   });
 });
+
+describe('npm ERESOLVE rule on a real peer range with spaces', () => {
+  it('names both sides of the conflict', () => {
+    const fx = readFileSync(
+      new URL('../fixtures/rules/node.npm.eresolve/pos-3.log', import.meta.url),
+      'utf8',
+    );
+    const f = analyzeLog(fx).findings[0]!;
+    expect(f.ruleId).toBe('node.npm.eresolve');
+    expect(f.explanation).toContain('typescript-eslint@8.71.2 requires the peer dependency');
+    expect(f.explanation).toContain('typescript@7.0.2');
+  });
+});

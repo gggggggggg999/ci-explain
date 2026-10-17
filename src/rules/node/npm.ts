@@ -16,7 +16,7 @@ export const npmEresolve: Rule = {
   confidence: 'high',
   verifiedOn: '2026-10-15',
   sourceNote:
-    'Checked against real npm 10.9.0 output (npm install with conflicting peer dependencies).',
+    'Checked against real npm 10.9.0 output (npm install with conflicting peer dependencies) and a real GitHub Actions npm ci failure (peer range containing spaces).',
   match(ctx) {
     const at = indexOfLine(ctx, isNpmCode('ERESOLVE'));
     if (at < 0) return null;
@@ -33,7 +33,7 @@ export const npmEresolve: Rule = {
         evidence.push(ev(line));
         const next = window[i + 1];
         const nt = next ? npmText(next.text) : null;
-        const m = nt ? /^(?:peer|peerOptional) (\S+) from (\S+)/.exec(nt) : null;
+        const m = nt ? /^(?:peer|peerOptional) (.{1,150}?) from (\S{1,150})/.exec(nt) : null;
         if (next && m) {
           evidence.push(ev(next));
           captures.required = cap(m[1] ?? '');

@@ -1,0 +1,15 @@
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: typescript-eslint@8.71.2
+npm error Found: typescript@7.0.2
+npm error node_modules/typescript
+npm error   dev typescript@"7.0.2" from the root project
+npm error   peer typescript@">=4.8.4" from ts-api-utils@2.5.0
+npm error
+npm error Could not resolve dependency:
+npm error peer typescript@">=4.8.4 <6.1.0" from typescript-eslint@8.71.2
+npm error node_modules/typescript-eslint
+npm error   dev typescript-eslint@"8.71.2" from the root project
+npm error
+npm error Conflicting peer dependency: typescript@6.0.3

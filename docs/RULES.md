@@ -139,7 +139,7 @@ EACCES is a Node.js/POSIX error code; the surrounding npm message format was not
 
 ### `node.npm.eresolve`
 
-Checked against real npm 10.9.0 output (npm install with conflicting peer dependencies).
+Checked against real npm 10.9.0 output (npm install with conflicting peer dependencies) and a real GitHub Actions npm ci failure (peer range containing spaces).
 
 ### `node.pnpm.lockfile`
 
