@@ -51,7 +51,8 @@
     "test": "vitest run",
     "eval": "tsx scripts/eval.ts",
     "docs:gen": "tsx scripts/gen-rules-doc.ts",
-    "docs:check": "tsx scripts/gen-rules-doc.ts --check"
+    "docs:check": "tsx scripts/gen-rules-doc.ts --check",
+    "prepare": "npm run build"
   },
   "dependencies": {
     "zod": "4.6.7"
