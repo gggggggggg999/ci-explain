@@ -1,7 +1,8 @@
 # Example: explain failed runs of another workflow in the job summary.
 #
-# STATUS: needs manual verification. This file was only validated as YAML and checked against the
-# GitHub Actions documentation; it has NOT been run in a real repository yet.
+# STATUS: partially verified. On 2026-10-17 this workflow ran successfully once in the author's own
+# repository, triggered by a failed same-repository pull request run. Fork pull requests and
+# other setups have NOT been tested; review it before relying on it.
 #
 # Read docs/GITHUB-ACTIONS.md before using it, especially the security notes.
 

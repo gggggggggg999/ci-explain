@@ -3,6 +3,16 @@
 All notable changes are documented here. The JSON output has its own `schemaVersion`; changes to it
 are recorded here as well and require a new `schemaVersion`.
 
+## Unreleased
+
+### Fixed
+
+- `node.npm.eresolve` now parses peer ranges that contain spaces (found by running `ci-explain github` on a real failed run).
+
+### Verified
+
+- `ci-explain github` and the example workflow were run once against real GitHub (the project's own repository, 2026-10-17).
+
 ## 0.1.0
 
 First public release. Early software: tested on synthetic fixtures and locally reproduced tool output only.

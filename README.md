@@ -33,7 +33,7 @@ export GITHUB_TOKEN=...   # a token that can read the repository's Actions logs
 node dist/cli/main.js github --repo owner/name --run 1234567890
 ```
 
-This command has been tested against local mock servers only, not against real GitHub.
+This command is covered by tests against local mock servers, and was run once against a real failed run of this project's own repository (2026-10-17). Other setups are untested.
 
 ## Example
 
@@ -167,7 +167,7 @@ confident answer is worse. Use `--export-excerpt` to request a new rule.
 is placed in code fences that cannot be closed by log content.
 
 **Can I use it in GitHub Actions?** There is an [example workflow](examples/github-actions/explain-failed-runs.yml)
-that writes the explanation to the job summary. It needs manual verification; see
+that writes the explanation to the job summary. It ran successfully once in the author's own repository and is otherwise untested; see
 [docs/GITHUB-ACTIONS.md](docs/GITHUB-ACTIONS.md).
 
 ## Development

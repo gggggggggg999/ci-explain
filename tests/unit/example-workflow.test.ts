@@ -47,7 +47,8 @@ describe('examples/github-actions/explain-failed-runs.yml', () => {
     expect(text).toContain('GITHUB_STEP_SUMMARY');
   });
 
-  it('is marked as requiring manual verification', () => {
-    expect(text).toMatch(/needs manual verification/i);
+  it('states honestly how far it was verified', () => {
+    expect(text).toMatch(/partially verified/i);
+    expect(text).toMatch(/Fork pull requests .* NOT been tested/is);
   });
 });

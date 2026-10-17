@@ -3,9 +3,10 @@
 Two things are covered here: the `ci-explain github` command, and the example workflow in
 [`examples/github-actions/explain-failed-runs.yml`](../examples/github-actions/explain-failed-runs.yml).
 
-> **Status of the example workflow: needs manual verification.** It has been validated as YAML,
-> checked by automated tests against the rules below, and compared with the GitHub documentation.
-> It has **not** been run in a real repository.
+> **Status of the example workflow: partially verified.** Besides YAML validation and automated tests of the
+> rules below, it ran successfully once on 2026-10-17 in the author's own repository, triggered by a failed
+> same-repository pull request run (and `ci-explain github` was run against that real failed run). **Pull
+> requests from forks, private repositories, and other setups have not been tested.**
 
 Documentation consulted (checked 2026-10-15):
 
@@ -35,7 +36,7 @@ What it does, using only the official REST API:
 Headers: `Accept: application/vnd.github+json`, `X-GitHub-Api-Version: 2026-03-10` (the value shown in the
 docs when checked), and `Authorization: Bearer <GITHUB_TOKEN>` **only on requests to the API host**.
 
-Safety properties (covered by automated tests against local mock servers, not against real GitHub):
+Safety properties (covered by automated tests against local mock servers; the happy path was also run against real GitHub once, on 2026-10-17, using the author's own repository; error paths and redirects to other hosts were not exercised against real GitHub):
 
 - Redirects are handled manually. The token is **never** sent to the host a redirect points to.
   Redirect targets must be `https` (plain `http` only for localhost, used by the tests).
@@ -47,7 +48,7 @@ Safety properties (covered by automated tests against local mock servers, not ag
 
 Token permissions: reading job logs needs read access to the repository's Actions data. For classic personal
 access tokens on private repositories the REST docs state the `repo` scope; for the workflow's own
-`GITHUB_TOKEN`, `actions: read` is the intended permission. This was not tested with a real token.
+`GITHUB_TOKEN`, `actions: read` is the intended permission. This was exercised with the author's own token on their own repository only.
 
 `--github-api-url` lets you point at GitHub Enterprise Server. The token is sent to whatever host you give, so
 only use hosts you trust (https is required; http only for localhost).

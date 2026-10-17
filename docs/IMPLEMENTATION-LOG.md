@@ -160,3 +160,16 @@ Packaged `files` limited to dist, README, LICENSE, CHANGELOG and the user-facing
 Drafts in docs/launch (Show HN, dev.to, Habr RU, Reddit, Telegram RU, press kit, demo script, awesome lists
 with conditions read from each list's contribution guide) and an empty docs/recognition.md. Nothing was
 published or submitted anywhere; the project does not yet meet the star/age conditions of the lists found.
+
+## Post-release verification (2026-10-17, owner granted full access)
+
+- Real GitHub test of `ci-explain github` (token from the local `gh` login, never printed) against a real
+  failed run of this repository (Dependabot TypeScript 7 bump): correct ERESOLVE finding for both matrix jobs.
+  It exposed a bug (peer ranges with spaces), fixed with a real-log fixture.
+- Example workflow dogfooded in `.github/workflows/explain-failed-runs.yml` (pinned commit). A deliberately
+  failing draft PR (closed afterwards) triggered it: the `explain` job succeeded, and the tool correctly named
+  the Prettier failure on that run. Not tested: fork PRs, private repos.
+- Dependabot PRs #1 (@types/node 26) and #2 (TypeScript 7) closed with explanations; ignore rules added.
+- npm: NOT published. `npm whoami` fails on this machine (not logged in); publishing needs the owner's own
+  npm login and 2FA, which must be entered by the owner in their own terminal.
+- Not possible without the owner: real LLM test (no API key), publishing launch posts (no accounts).

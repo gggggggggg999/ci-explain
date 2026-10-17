@@ -1,9 +1,6 @@
-# Example: explain failed runs of another workflow in the job summary.
-#
-# Dogfooding copy of examples/github-actions/explain-failed-runs.yml (ci-explain pinned to a reviewed commit).
-# GitHub Actions documentation; it has NOT been run in a real repository yet.
-#
-# Read docs/GITHUB-ACTIONS.md before using it, especially the security notes.
+# Dogfooding copy of examples/github-actions/explain-failed-runs.yml.
+# ci-explain itself is checked out at a reviewed, pinned commit.
+# See docs/GITHUB-ACTIONS.md for the design and security notes.
 
 name: Explain failed runs
 
