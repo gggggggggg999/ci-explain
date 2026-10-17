@@ -1,0 +1,57 @@
+name: ci-explain
+description: Explain why a GitHub Actions run failed, with the exact log lines as evidence, in the job summary.
+author: Myrza Dokturbekov
+
+inputs:
+  run-id:
+    description: ID of the workflow run to explain. For a workflow_run trigger use github.event.workflow_run.id.
+    required: true
+  repository:
+    description: Repository of the run, as owner/name.
+    required: false
+    default: ${{ github.repository }}
+  token:
+    description: Token that can read Actions logs of the repository (actions "read" permission is enough).
+    required: false
+    default: ${{ github.token }}
+  max-findings:
+    description: Maximum number of findings to show.
+    required: false
+    default: '3'
+  max-jobs:
+    description: Maximum number of failed jobs to analyze.
+    required: false
+    default: '3'
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: '22'
+
+    - name: Build ci-explain
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      run: npm ci --no-audit --no-fund
+
+    - name: Explain the run
+      shell: bash
+      env:
+        # Inputs are passed through env, never interpolated into the script.
+        RUN_ID: ${{ inputs.run-id }}
+        REPO: ${{ inputs.repository }}
+        MAX_FINDINGS: ${{ inputs.max-findings }}
+        MAX_JOBS: ${{ inputs.max-jobs }}
+        GITHUB_TOKEN: ${{ inputs.token }}
+        ACTION_PATH: ${{ github.action_path }}
+      run: |
+        node "$ACTION_PATH/dist/cli/main.js" github \
+          --repo "$REPO" --run "$RUN_ID" \
+          --max-findings "$MAX_FINDINGS" --max-jobs "$MAX_JOBS" \
+          --format markdown > "$RUNNER_TEMP/ci-explain.md"
+        cat "$RUNNER_TEMP/ci-explain.md" >> "$GITHUB_STEP_SUMMARY"
+
+branding:
+  icon: search
+  color: red
