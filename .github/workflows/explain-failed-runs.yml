@@ -17,6 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: gggggggggg999/ci-explain@a56d8eec93d42db1ddf0b9278ca0378dcc04cbdf # main at the time of writing
+      - uses: gggggggggg999/ci-explain@90c242694fa4bbe104a5bef8e26090b98e2f426a # main at the time of writing
         with:
           run-id: ${{ github.event.workflow_run.id }}
